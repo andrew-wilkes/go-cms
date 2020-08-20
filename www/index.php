@@ -6,7 +6,8 @@
 $server_script_path = "/usr/share/nginx/apps/gocms";
 
 if (basename(__DIR__) != "www") {
-     exec(sprintf("%s %s %s", json_encode((object)$_GET), $server_script_path, json_encode((object)$_POST)), $output, $code);
+    $cmd = sprintf("%s/gocms %s %s", $server_script_path, json_encode((object)$_GET), json_encode((object)$_POST));
+    exec($cmd, $output, $code);
     if ($code == 0) {
         $response = json_decode($output[0]);
         foreach ($response->Headers as $header)
