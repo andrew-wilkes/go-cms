@@ -12,4 +12,5 @@
 *.out
 
 .config
-bin/
+build/*
+!build/README.md
