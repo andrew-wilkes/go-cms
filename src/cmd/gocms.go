@@ -19,10 +19,10 @@ func main() {
 	args := os.Args[1:]
 
 	// Extract the GET map
-	getArg := extractArg(args, 0)
+	getArg := ExtractArg(args, 0)
 
 	// Extract the POST map
-	postArg := extractArg(args, 1)
+	postArg := ExtractArg(args, 1)
 
 	headers, content := processInput(getArg, postArg)
 
@@ -38,12 +38,12 @@ func main() {
 	fmt.Print(string(resB))
 }
 
-func extractArg(args []string, i int) string {
+// ExtractArg is exported
+func ExtractArg(args []string, i int) string {
 	if len(args) > i {
 		return args[i]
-	} else {
-		return ""
 	}
+	return ""
 }
 
 func processInput(getArg string, postArg string) ([]string, string) {
