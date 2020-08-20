@@ -19,16 +19,10 @@ func main() {
 	args := os.Args[1:]
 
 	// Extract the GET map
-	getArg := ""
-	if len(args) > 0 {
-		getArg = args[0]
-	}
+	getArg := extractArg(args, 0)
 
 	// Extract the POST map
-	postArg := ""
-	if len(args) > 1 {
-		postArg = args[1]
-	}
+	postArg := extractArg(args, 1)
 
 	headers, content := processInput(getArg, postArg)
 
@@ -44,7 +38,16 @@ func main() {
 	fmt.Print(string(resB))
 }
 
+func extractArg(args []string, i int) string {
+	if len(args) > i {
+		return args[i]
+	} else {
+		return ""
+	}
+}
+
 func processInput(getArg string, postArg string) ([]string, string) {
+	// The input strings should be maps {key: data} so we need to parse them
 	return headers(), content(getArg, postArg)
 }
 
