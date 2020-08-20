@@ -12,5 +12,4 @@
 *.out
 
 .config
-build/
-main
+bin/
