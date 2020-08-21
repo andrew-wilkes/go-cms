@@ -1,13 +1,16 @@
 <?php
+define("USING_TOOL", true);
 
-$web_root = "/usr/share/nginx/www/gocms.com";
-$server_script_path = "/usr/share/nginx/apps/gocms";
+include_once(__DIR__ . "/config.php");
+
+$web_root = $config->get("web_root");
+$server_script_path = $config->get("server_script_path");
 
 $dir = dirname(__DIR__);
 
 $index = $dir . "/www/index.php";
 
-if (!file_exists($server_script_path)) die("$server_script_path path invalid!");
+if (!file_exists($server_script_path)) die("$server_script_path path invalid!\n");
 
 $gocms = $dir . "/build/gocms";
 

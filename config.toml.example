@@ -1,0 +1,7 @@
+# Configuration data
+
+[website]
+web_root = "/usr/share/nginx/www/gocms.com"
+
+[server]
+server_script_path = "/usr/share/nginx/apps/gocms"

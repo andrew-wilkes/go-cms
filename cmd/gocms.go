@@ -13,18 +13,13 @@ type response struct {
 
 // This is the entry point function for the application
 // It is called (from index.php) with command line arguments representing
-// the GET and POST data that is received from the client by the web server
+// the source file name and an array of information passed from the server about the request
+// See: https://www.php.net/manual/en/reserved.variables.server.php
 func main() {
-	// Get the command line arguments
-	args := os.Args[1:]
+	// Get the passed array of information ignoring the first parameter which is a file name
+	info := os.Args[1:]
 
-	// Extract the GET map
-	getArg := ExtractArg(args, 0)
-
-	// Extract the POST map
-	postArg := ExtractArg(args, 1)
-
-	headers, content := processInput(getArg, postArg)
+	headers, content := ProcessInput(info)
 
 	// Construct the response containing headers and content
 	resA := &response{
@@ -38,23 +33,16 @@ func main() {
 	fmt.Print(string(resB))
 }
 
-// ExtractArg is exported
-func ExtractArg(args []string, i int) string {
-	if len(args) > i {
-		return args[i]
-	}
-	return ""
-}
-
-func processInput(getArg string, postArg string) ([]string, string) {
-	// The input strings should be maps {key: data} so we need to parse them
-	return headers(), content(getArg, postArg)
+// ProcessInput creates headers and content according to the server input info.
+func ProcessInput(info []string) ([]string, string) {
+	// The info will be comprised of a map of key:values
+	return headers(), content(info)
 }
 
 func headers() []string {
 	return []string{"apple", "peach", "pear"}
 }
 
-func content(getArg string, postArg string) string {
-	return fmt.Sprintf("The content. Get: %s Post: %s", getArg, postArg)
+func content(info []string) string {
+	return fmt.Sprintf("The server info: %v", info)
 }
