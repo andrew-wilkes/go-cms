@@ -4,7 +4,7 @@ $file = "gocms.go";
 
 $dir = dirname(__DIR__);
 
-$src = $dir . "/cmd/" . $file;
+$src = $dir . "/cmd/main/" . $file;
 
 $dest = $dir . "/build";
 

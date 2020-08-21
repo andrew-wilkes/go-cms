@@ -44,5 +44,5 @@ func headers() []string {
 }
 
 func content(info []string) string {
-	return fmt.Sprintf("The server info: %v", info)
+	return fmt.Sprintf("%v", info[1])
 }
