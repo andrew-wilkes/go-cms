@@ -20,11 +20,13 @@ else
 <html>
   <head>
     <title>Go CMS Test Page</title>
+    <meta charset="utf-8">
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
   </head>
   <body>
     <script>
-      // Make a request for a user with a given ID
+      // Do a GET request for a user with a given ID
       axios.get('/user?ID=12345')
         .then(function (response) {
           // handle success
@@ -38,7 +40,7 @@ else
           // always executed
         });
 
-      // Perform a POST request
+      // Do a POST request with application/json content
       axios.post('/user', {
         firstName: 'Fred',
         lastName: 'Flintstone'
@@ -50,7 +52,10 @@ else
         console.log(error);
       });
 
-      // Perform a Form data submission
+      // Do a POST of regular form data
+      $.post("/jquery-user", { name: "John", time: "2pm" });
+
+      // Do a multi-part form data submission such as used for file uploads
       let data = new FormData();
       data.append('binary', Uint8Array.from('test', c => c.charCodeAt(0)));
       axios.post('/form-user', data)
