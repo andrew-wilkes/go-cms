@@ -6,8 +6,6 @@ $_SERVER['GET_DATA'] = (object)$_GET;
 $log_file_name = urlencode($_SERVER['REQUEST_URI']);
 file_put_contents(sprintf("log/args-%s.json", $log_file_name), json_encode($_SERVER));
 
-$cmd = sprintf("/var/www/apps/gocms/gocms %s", json_encode($_SERVER));
-
 $cmd = sprintf("server_script_path/gocms %s", json_encode($_SERVER));
 exec($cmd, $output, $code);
 if ($code == 0) {
