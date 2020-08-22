@@ -10,11 +10,12 @@ $dir = dirname(__DIR__);
 
 $index = $dir . "/www/index.php";
 
-if (!file_exists($server_script_path)) die("$server_script_path path invalid!\n");
+if (!file_exists($server_script_path)) die("$server_script_path path invalid!" . PHP_EOL);
 
 $gocms = $dir . "/build/gocms";
 
-if (!file_exists($gocms)) die("gocms build file is missing!\n");
+if (!file_exists($gocms)) die("The gocms app file is missing!" . PHP_EOL);
+// Later take into account other platforms such as where we would expect gocms.exe
 
 // Copy gocms program to server
 exec("cp $gocms $server_script_path");

@@ -38,6 +38,6 @@ class Config {
     public function get($token) {
         if (array_key_exists($token, $this->values))
             return $this->values[$token];
-        die("Missing config entry for: $token\n");
+        die("Missing config entry for: $token" . PHP_EOL);
     }
 }
