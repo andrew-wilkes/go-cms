@@ -3,7 +3,10 @@ $_SERVER['RAW_DATA'] = file_get_contents("php://input");
 $_SERVER['POST_DATA'] = (object)$_POST;
 $_SERVER['GET_DATA'] = (object)$_GET;
 
-file_put_contents(sprintf("log/args%s.json", $_SERVER['REQUEST_TIME_FLOAT']), json_encode($_SERVER));
+$log_file_name = urlencode($_SERVER['REQUEST_URI']);
+file_put_contents(sprintf("log/args-%s.json", $log_file_name), json_encode($_SERVER));
+
+$cmd = sprintf("/var/www/apps/gocms/gocms %s", json_encode($_SERVER));
 
 $cmd = sprintf("server_script_path/gocms %s", json_encode($_SERVER));
 exec($cmd, $output, $code);
@@ -26,8 +29,10 @@ else
   </head>
   <body>
     <script>
+      // Generate the various kinds of http requests that we may expect to handle
+      // Using browser development tools and F12 we may observe what happens in detail
       // Do a GET request for a user with a given ID
-      axios.get('/user?ID=12345')
+      axios.get('/get-user?ID=12345')
         .then(function (response) {
           // handle success
           console.log(response);
@@ -36,12 +41,9 @@ else
           // handle error
           console.log(error);
         })
-        .then(function () {
-          // always executed
-        });
 
       // Do a POST request with application/json content
-      axios.post('/user', {
+      axios.post('/single-page-app-user', {
         firstName: 'Fred',
         lastName: 'Flintstone'
       })
@@ -53,12 +55,12 @@ else
       });
 
       // Do a POST of regular form data
-      $.post("/jquery-user", { name: "John", time: "2pm" });
+      $.post("/form-submit-user", { name: "John", time: "2pm" });
 
       // Do a multi-part form data submission such as used for file uploads
       let data = new FormData();
       data.append('binary', Uint8Array.from('test', c => c.charCodeAt(0)));
-      axios.post('/form-user', data)
+      axios.post('/file-upload-form-user', data)
         .then(function (response) {
           console.log(response);
         })
