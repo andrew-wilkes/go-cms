@@ -1,7 +1,5 @@
 <?php
 $_SERVER['RAW_DATA'] = file_get_contents("php://input");
-$_SERVER['POST_DATA'] = (object)$_POST;
-$_SERVER['GET_DATA'] = (object)$_GET;
 #LOG
 $cmd = sprintf("server_script_path/gocms %s", json_encode($_SERVER));
 exec($cmd, $output, $code);
