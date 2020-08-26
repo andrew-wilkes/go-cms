@@ -29,7 +29,7 @@ $log_code = '$log_file_name = urlencode($_SERVER[\'REQUEST_URI\']);
 file_put_contents(sprintf(\'log/args-%s.json\', $log_file_name), json_encode($_SERVER));';
 $php_code = file_get_contents($index);
 if ($test_mode) {
-    $php_code = str_replace("#LOG\n", $log_code, $php_code);
+    $php_code = str_replace("#LOG", $log_code, $php_code);
     $php_code = str_replace("#HTML", file_get_contents($dir . "/www/test.html"), $php_code);
 } else {
     $php_code = str_replace("\n#LOG", "", $php_code);
