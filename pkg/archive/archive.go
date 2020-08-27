@@ -27,12 +27,12 @@ func Generate() {
 
 // GetYears - get a list of years containing posts
 func GetYears() []YearItem {
-	return []YearItem{YearItem{year: 2012, count: 8}, YearItem{year: 2020, count: 6}}
+	return []YearItem{YearItem{2012, 8}, YearItem{2020, 6}}
 }
 
 // GetMonths - get a list of months containing posts
 func GetMonths(year int) []MonthItem {
-	return []MonthItem{MonthItem{month: 4, count: 2}, MonthItem{month: 6, count: 34}}
+	return []MonthItem{MonthItem{4, 2}, MonthItem{6, 34}}
 }
 
 // GetMonth - get a list of days containing posts, and the post meta data
@@ -41,7 +41,7 @@ func GetMonth(month int) []DayItem {
 		DayItem{
 			day: 1,
 			posts: []page.Info{
-				page.Get(1),
+				page.Get(1, false),
 			},
 		},
 	}

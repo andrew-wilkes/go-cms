@@ -17,7 +17,7 @@ type Info struct {
 // GetPosts - get a list of posts within a category
 func GetPosts(id int) []page.Info {
 	return []page.Info{
-		page.Get(1),
+		page.Get(1, false),
 	}
 }
 
