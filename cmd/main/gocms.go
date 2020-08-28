@@ -6,6 +6,18 @@ import (
 	"os"
 )
 
+// URI contains the route and GET parameters
+var URI string
+
+// Method is the request method (GET or POST)
+var Method string
+
+// RawData contains any json POST data
+var RawData string
+
+// Domain is used for the file path to data and pages
+var Domain string
+
 type response struct {
 	Headers []string
 	Content string
@@ -39,19 +51,18 @@ func ProcessInput(jsonData string) ([]string, string) {
 	data := []byte(jsonData)
 	var serverVars map[string]json.RawMessage // The data values are strings and numbers
 	err := json.Unmarshal(data, &serverVars)
-	var uriStr string
-	var methodStr string
-	var rawDataStr string
 	if err == nil {
 		uri := serverVars["REQUEST_URI"]
-		err = json.Unmarshal(uri, &uriStr)
+		err = json.Unmarshal(uri, &URI)
 		method := serverVars["REQUEST_METHOD"]
-		err = json.Unmarshal(method, &methodStr)
+		err = json.Unmarshal(method, &Method)
 		rawData := serverVars["RAW_DATA"]
-		err = json.Unmarshal(rawData, &rawDataStr)
+		err = json.Unmarshal(rawData, &RawData)
+		domain := serverVars["SERVER_NAME"]
+		err = json.Unmarshal(domain, &Domain)
 	}
 
-	html := fmt.Sprintf("Err: %v URI: %v Method: %v Data: %v\n", err, uriStr, methodStr, rawDataStr)
+	html := fmt.Sprintf("Error: %v URI: %v Method: %v Data: %v Domain: %v\n", err, URI, Method, RawData, Domain)
 	return headers(), content(html)
 }
 

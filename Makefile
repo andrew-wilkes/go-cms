@@ -1,5 +1,5 @@
-build:
-	go build -o /build /cmd/main/gocms.go
+b:
+	php scripts/build.php
 
 deploy:
 	php scripts/deploy.php
