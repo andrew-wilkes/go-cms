@@ -2,6 +2,7 @@
 
 [website]
 web_root = "/var/www/gocms.com"
+domain = "gocms.com"
 
 [server]
 server_script_path = "/var/www/apps/gocms"

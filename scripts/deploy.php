@@ -9,6 +9,7 @@ include_once(__DIR__ . "/config.php");
 
 $web_root = $config->get("web_root");
 $server_script_path = $config->get("server_script_path");
+$domain = $config->get("domain");
 
 $dir = dirname(__DIR__);
 
@@ -39,4 +40,13 @@ if ($test_mode) {
 // Inject server_script_path into index.php and copy to server
 file_put_contents($web_root . "/index.php", str_replace('server_script_path', $server_script_path, $php_code));
 
+// Set up folders
+$d = "$server_script_path/$domain";
+add_folder("$d/data");
+add_folder("$d/pages");
 echo "Done\n";
+
+function add_folder($fn) {
+    if (!file_exists($fn))
+        mkdir($fn);
+}
