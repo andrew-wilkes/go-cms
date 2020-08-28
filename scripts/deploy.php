@@ -38,3 +38,5 @@ if ($test_mode) {
 
 // Inject server_script_path into index.php and copy to server
 file_put_contents($web_root . "/index.php", str_replace('server_script_path', $server_script_path, $php_code));
+
+echo "Done\n";
