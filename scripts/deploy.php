@@ -44,6 +44,7 @@ file_put_contents($web_root . "/index.php", str_replace('server_script_path', $s
 $d = "$server_script_path/$domain";
 add_folder("$d/data");
 add_folder("$d/pages");
+add_folder("$d/templates");
 echo "Done\n";
 
 function add_folder($fn) {

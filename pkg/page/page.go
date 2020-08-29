@@ -31,6 +31,7 @@ type Info struct {
 	Status      Status
 	Category    int
 	Type        Type
+	Template    string
 	Timestamp   int
 }
 

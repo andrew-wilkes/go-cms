@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"strings"
 )
 
 // URI contains the route and GET parameters
@@ -21,6 +22,12 @@ var Domain string
 type response struct {
 	Headers []string
 	Content string
+}
+
+// Request type
+type Request struct {
+	route  string
+	params map[string]string
 }
 
 // This is the entry point function for the application
@@ -72,4 +79,19 @@ func headers() []string {
 
 func content(html string) string {
 	return fmt.Sprintf("%v", html)
+}
+
+// ParseURI splits the uri into component parts
+func ParseURI(uri string) Request {
+	var r = Request{params: make(map[string]string)}
+	p := strings.Split(uri, "?")
+	r.route = p[0]
+	if len(p) > 1 {
+		params := strings.Split(p[1], "&")
+		for _, param := range params {
+			kv := strings.Split(param, "=")
+			r.params[kv[0]] = kv[1]
+		}
+	}
+	return r
 }
