@@ -3,31 +3,26 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"gocms/pkg/router"
 	"os"
 	"strings"
 )
 
-// URI contains the route and GET parameters
-var URI string
+// uri contains the route and GET parameters
+var uri string
 
-// Method is the request method (GET or POST)
-var Method string
+// method is the request method (GET or POST)
+var method string
 
-// RawData contains any json POST data
-var RawData string
+// rawData contains any json POST data
+var rawData string
 
-// Domain is used for the file path to data and pages
-var Domain string
+// domain is used for the file path to data and pages
+var domain string
 
 type response struct {
 	Headers []string
 	Content string
-}
-
-// Request type
-type Request struct {
-	route  string
-	params map[string]string
 }
 
 // This is the entry point function for the application
@@ -57,17 +52,18 @@ func main() {
 func ProcessInput(jsonData string) ([]string, string) {
 	serverVars, err := DecodeRawData(jsonData)
 	if err == nil {
-		uri := serverVars["REQUEST_URI"]
-		err = json.Unmarshal(uri, &URI)
-		method := serverVars["REQUEST_METHOD"]
-		err = json.Unmarshal(method, &Method)
-		rawData := serverVars["RAW_DATA"]
-		err = json.Unmarshal(rawData, &RawData)
-		domain := serverVars["SERVER_NAME"]
-		err = json.Unmarshal(domain, &Domain)
+		_uri := serverVars["REQUEST_URI"]
+		err = json.Unmarshal(_uri, &uri)
+		_method := serverVars["REQUEST_METHOD"]
+		err = json.Unmarshal(_method, &method)
+		_rawData := serverVars["RAW_DATA"]
+		err = json.Unmarshal(_rawData, &rawData)
+		_domain := serverVars["SERVER_NAME"]
+		err = json.Unmarshal(_domain, &domain)
+		router.Process(ParseURI(uri))
 	}
 
-	html := fmt.Sprintf("Error: %v URI: %v Method: %v Data: %v Domain: %v\n", err, URI, Method, RawData, Domain)
+	html := fmt.Sprintf("Error: %v uri: %v Method: %v Data: %v Domain: %v\n", err, uri, method, rawData, domain)
 	return headers(), content(html)
 }
 
@@ -80,15 +76,15 @@ func content(html string) string {
 }
 
 // ParseURI splits the uri into component parts
-func ParseURI(uri string) Request {
-	var r = Request{params: make(map[string]string)}
+func ParseURI(uri string) router.Request {
+	var r = router.Request{Params: make(map[string]string)}
 	p := strings.Split(uri, "?")
-	r.route = p[0]
+	r.Route = p[0]
 	if len(p) > 1 {
 		params := strings.Split(p[1], "&")
 		for _, param := range params {
 			kv := strings.Split(param, "=")
-			r.params[kv[0]] = kv[1]
+			r.Params[kv[0]] = kv[1]
 		}
 	}
 	return r
