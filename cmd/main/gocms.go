@@ -55,9 +55,7 @@ func main() {
 
 // ProcessInput creates headers and content according to the server input info.
 func ProcessInput(jsonData string) ([]string, string) {
-	data := []byte(jsonData)
-	var serverVars map[string]json.RawMessage // The data values are strings and numbers
-	err := json.Unmarshal(data, &serverVars)
+	serverVars, err := DecodeRawData(jsonData)
 	if err == nil {
 		uri := serverVars["REQUEST_URI"]
 		err = json.Unmarshal(uri, &URI)
@@ -94,4 +92,12 @@ func ParseURI(uri string) Request {
 		}
 	}
 	return r
+}
+
+// DecodeRawData decodes a json text string to a map of values
+func DecodeRawData(rawData string) (map[string]json.RawMessage, error) {
+	data := []byte(rawData)
+	var keyValues map[string]json.RawMessage // The data values are strings and numbers
+	err := json.Unmarshal(data, &keyValues)
+	return keyValues, err
 }
