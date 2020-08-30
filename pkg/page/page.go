@@ -41,10 +41,6 @@ type Info struct {
 	Timestamp   int
 }
 
-var pages []Info
-
-const pagesFile = "/data/pages.json"
-
 // Get by ID a page or post
 func Get(domain string, id int, getContent bool) Info {
 	return find(domain, id, "", getContent)
@@ -54,6 +50,8 @@ func Get(domain string, id int, getContent bool) Info {
 func GetByRoute(domain string, route string, getContent bool) Info {
 	return find(domain, -1, route, getContent)
 }
+
+var pages []Info
 
 func find(domain string, id int, route string, getContent bool) Info {
 	var page Info
@@ -77,6 +75,8 @@ func LoadContent(domain string, id int) string {
 	content, _ := ioutil.ReadFile(fmt.Sprintf("%s/pages/%d.html", domain, id))
 	return string(content)
 }
+
+const pagesFile = "/data/pages.json"
 
 // LoadData loads the data from the pages data file
 func LoadData(domain string) {

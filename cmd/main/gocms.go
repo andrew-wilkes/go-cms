@@ -8,18 +8,6 @@ import (
 	"strings"
 )
 
-// uri contains the route and GET parameters
-var uri string
-
-// method is the request method (GET or POST)
-var method string
-
-// rawData contains any json POST data
-var rawData string
-
-// domain is used for the file path to data and pages
-var domain string
-
 type response struct {
 	Headers []string
 	Content string
@@ -47,6 +35,18 @@ func main() {
 	// Output the response
 	fmt.Print(string(resB))
 }
+
+// uri contains the route and GET parameters
+var uri string
+
+// method is the request method (GET or POST)
+var method string
+
+// rawData contains any json POST data
+var rawData string
+
+// domain is used for the file path to data and pages
+var domain string
 
 // ProcessInput creates headers and content according to the server input info.
 func ProcessInput(jsonData string) ([]string, string) {
