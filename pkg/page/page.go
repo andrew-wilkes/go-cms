@@ -3,6 +3,7 @@ package page
 import (
 	"encoding/json"
 	"fmt"
+	"gocms/pkg/files"
 	"io/ioutil"
 )
 
@@ -67,12 +68,12 @@ func find(domain string, id int, route string, getContent bool) Info {
 			break
 		}
 	}
-	return page //Info{Title: "page title", Route: "/page-route", Timestamp: 3456}
+	return page
 }
 
 // LoadContent return the contents of the page content file
 func LoadContent(domain string, id int) string {
-	content, _ := ioutil.ReadFile(fmt.Sprintf("%s/pages/%d.html", domain, id))
+	content, _ := ioutil.ReadFile(fmt.Sprintf("%s%s/pages/%d.html", files.Root, domain, id))
 	return string(content)
 }
 
@@ -80,12 +81,12 @@ const pagesFile = "/data/pages.json"
 
 // LoadData loads the data from the pages data file
 func LoadData(domain string) {
-	data, err := ioutil.ReadFile(domain + pagesFile)
+	data, err := ioutil.ReadFile(files.Root + domain + pagesFile)
 	if err != nil {
 		pages = []Info{Info{}}
 		b, _ := json.Marshal(pages)
 		data = b
-		err := ioutil.WriteFile(domain+pagesFile, b, 0660)
+		err := ioutil.WriteFile(files.Root+domain+pagesFile, b, 0660)
 		if err != nil {
 			panic(err)
 		}

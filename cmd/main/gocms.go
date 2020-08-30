@@ -60,7 +60,9 @@ func ProcessInput(jsonData string) ([]string, string) {
 		err = json.Unmarshal(_rawData, &rawData)
 		_domain := serverVars["SERVER_NAME"]
 		err = json.Unmarshal(_domain, &domain)
-		router.Process(ParseURI(uri))
+		r := ParseURI(uri)
+		r.Domain = domain
+		router.Process(r)
 	}
 
 	html := fmt.Sprintf("Error: %v uri: %v Method: %v Data: %v Domain: %v\n", err, uri, method, rawData, domain)
