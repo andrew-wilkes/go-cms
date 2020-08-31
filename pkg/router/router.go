@@ -1,11 +1,13 @@
 package router
 
 import (
+	"fmt"
 	"gocms/pkg/files"
 	"gocms/pkg/page"
 	"io/ioutil"
 	"regexp"
 	"strings"
+	"time"
 )
 
 // Request type
@@ -50,11 +52,14 @@ func GetTemplate(domain string, template string) string {
 
 // ReplaceTokens in HTML
 func ReplaceTokens(html string, page page.Info) string {
+	year, month, day := time.Now().Date()
 	html = strings.ReplaceAll(html, `#TITLE#`, page.Title)
 	html = strings.ReplaceAll(html, `#TOPMENU#`, page.Title)
 	html = strings.ReplaceAll(html, `#CONTENT#`, page.Content)
 	html = strings.ReplaceAll(html, `#FOOTERMENU#`, page.Title)
-	html = strings.ReplaceAll(html, `#DATE#`, page.Title)
+	html = strings.ReplaceAll(html, `#DAY#`, fmt.Sprint(day))
+	html = strings.ReplaceAll(html, `#MONTH#`, fmt.Sprint(month))
+	html = strings.ReplaceAll(html, `#YEAR#`, fmt.Sprint(year))
 	html = strings.ReplaceAll(html, `#SCRIPTS#`, page.Title)
 	return html
 }
