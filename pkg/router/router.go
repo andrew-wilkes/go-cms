@@ -1,7 +1,6 @@
 package router
 
 import (
-	"fmt"
 	"gocms/pkg/files"
 	"gocms/pkg/page"
 	"io/ioutil"
@@ -17,14 +16,18 @@ type Request struct {
 }
 
 // Process a request
-func Process(r Request) {
+func Process(r Request) ([]string, string) {
+	headers := []string{}
+	content := ""
 	page := page.GetByRoute(r.Domain, r.Route, true)
 	if page.ID == 0 {
-		fmt.Println("Page not found!")
+		headers = append(headers, "HTTP/1.1 404 Not Found")
+		content = "Page not found at: " + r.Route
 	} else {
 		template := GetTemplate(r.Domain, page.Template)
-		fmt.Println(template)
+		content = ReplaceTokens(template, page)
 	}
+	return headers, content
 }
 
 // GetTemplate for page

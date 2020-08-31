@@ -3,8 +3,10 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"gocms/pkg/files"
 	"gocms/pkg/router"
 	"os"
+	"path/filepath"
 	"strings"
 )
 
@@ -22,7 +24,8 @@ func main() {
 	// https://stackoverflow.com/questions/11066946/partly-json-unmarshal-into-a-map-in-go
 	// https://www.geeksforgeeks.org/how-to-parse-json-in-golang/
 
-	headers, content := ProcessInput(os.Args[1:][0])
+	files.Root, _ = filepath.Split(os.Args[0])
+	headers, content := ProcessInput(os.Args[1])
 
 	// Construct the response containing headers and content
 	resA := &response{
@@ -50,6 +53,8 @@ var domain string
 
 // ProcessInput creates headers and content according to the server input info.
 func ProcessInput(jsonData string) ([]string, string) {
+	headers := []string{}
+	content := ""
 	serverVars, err := DecodeRawData(jsonData)
 	if err == nil {
 		_uri := serverVars["REQUEST_URI"]
@@ -62,19 +67,11 @@ func ProcessInput(jsonData string) ([]string, string) {
 		err = json.Unmarshal(_domain, &domain)
 		r := ParseURI(uri)
 		r.Domain = domain
-		router.Process(r)
+		headers, content = router.Process(r)
+	} else {
+		content = "Error decoding input data!"
 	}
-
-	html := fmt.Sprintf("Error: %v uri: %v Method: %v Data: %v Domain: %v\n", err, uri, method, rawData, domain)
-	return headers(), content(html)
-}
-
-func headers() []string {
-	return []string{"apple", "peach", "pear"}
-}
-
-func content(html string) string {
-	return fmt.Sprintf("%v", html)
+	return headers, content
 }
 
 // ParseURI splits the uri into component parts

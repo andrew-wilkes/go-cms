@@ -42,6 +42,8 @@ file_put_contents($web_root . "/index.php", str_replace('server_script_path', $s
 
 // Set up folders
 $d = "$server_script_path/$domain";
+echo "Setting up folders in: $server_script_path\n";
+add_folder("$d");
 add_folder("$d/data");
 add_folder("$d/pages");
 add_folder("$d/templates");
