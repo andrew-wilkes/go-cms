@@ -20,10 +20,6 @@ type response struct {
 // the source file name and an array of information passed from the server about the request
 // See: https://www.php.net/manual/en/reserved.variables.server.php
 func main() {
-	// Get the passed array of information ignoring the first parameter which is a file name
-	// https://stackoverflow.com/questions/11066946/partly-json-unmarshal-into-a-map-in-go
-	// https://www.geeksforgeeks.org/how-to-parse-json-in-golang/
-
 	files.Root, _ = filepath.Split(os.Args[0])
 	headers, content := ProcessInput(os.Args[1])
 
