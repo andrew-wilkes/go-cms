@@ -39,34 +39,25 @@ func main() {
 	fmt.Print(string(resB))
 }
 
-// uri contains the route and GET parameters
-var uri string
-
-// method is the request method (GET or POST)
-var method string
-
-// rawData contains any json POST data
-var rawData string
-
-// domain is used for the file path to data and pages
-var domain string
-
 // ProcessInput creates headers and content according to the server input info.
 func ProcessInput(jsonData string) ([]string, string) {
 	headers := []string{}
 	content := ""
 	serverVars, err := DecodeRawData(jsonData)
 	if err == nil {
+		var uri string // contains the route and GET parameters
 		_uri := serverVars["REQUEST_URI"]
 		err = json.Unmarshal(_uri, &uri)
-		_method := serverVars["REQUEST_METHOD"]
-		err = json.Unmarshal(_method, &method)
+		r := ParseURI(uri)
+		_domain := serverVars["SERVER_NAME"] // this is used for the file path to data and pages
+		err = json.Unmarshal(_domain, &r.Domain)
+		_method := serverVars["REQUEST_METHOD"] // the request method (GET or POST)
+		err = json.Unmarshal(_method, &r.Method)
+		var rawData string // contains any json POST data
 		_rawData := serverVars["RAW_DATA"]
 		err = json.Unmarshal(_rawData, &rawData)
-		_domain := serverVars["SERVER_NAME"]
-		err = json.Unmarshal(_domain, &domain)
-		r := ParseURI(uri)
-		r.Domain = domain
+		// Decode the json string
+		r.PostData, err = DecodeRawData(rawData)
 		headers, content = router.Process(r)
 	} else {
 		content = "Error decoding input data!"
@@ -76,14 +67,14 @@ func ProcessInput(jsonData string) ([]string, string) {
 
 // ParseURI splits the uri into component parts
 func ParseURI(uri string) router.Request {
-	var r = router.Request{Params: make(map[string]string)}
+	var r = router.Request{GetArgs: make(map[string]string)}
 	p := strings.Split(uri, "?")
 	r.Route = p[0]
 	if len(p) > 1 {
-		params := strings.Split(p[1], "&")
-		for _, param := range params {
-			kv := strings.Split(param, "=")
-			r.Params[kv[0]] = kv[1]
+		args := strings.Split(p[1], "&")
+		for _, arg := range args {
+			kv := strings.Split(arg, "=")
+			r.GetArgs[kv[0]] = kv[1]
 		}
 	}
 	return r

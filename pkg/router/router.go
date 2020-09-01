@@ -1,6 +1,7 @@
 package router
 
 import (
+	"encoding/json"
 	"fmt"
 	"gocms/pkg/files"
 	"gocms/pkg/page"
@@ -13,9 +14,11 @@ import (
 
 // Request type
 type Request struct {
-	Domain string
-	Route  string
-	Params map[string]string
+	Domain   string
+	Route    string
+	Method   string
+	GetArgs  map[string]string
+	PostData map[string]json.RawMessage
 }
 
 // Process a request
