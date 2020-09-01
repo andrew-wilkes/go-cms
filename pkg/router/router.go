@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"gocms/pkg/files"
 	"gocms/pkg/page"
+	"gocms/pkg/user"
 	"io/ioutil"
 	"regexp"
 	"strings"
@@ -27,7 +28,7 @@ func Process(r Request) ([]string, string) {
 		content = "Page not found at: " + r.Route
 	} else {
 		template := GetTemplate(r.Domain, page.Template)
-		content = ReplaceTokens(template, page)
+		content = ReplaceTokens(r.Domain, template, page)
 	}
 	return headers, content
 }
@@ -51,8 +52,16 @@ func GetTemplate(domain string, template string) string {
 }
 
 // ReplaceTokens in HTML
-func ReplaceTokens(html string, page page.Info) string {
+func ReplaceTokens(domain string, html string, page page.Info) string {
 	year, month, day := time.Now().Date()
+	if user.GetStatus().LoggedIn {
+		html = strings.Replace(html, `#CSS#`, `<link rel="stylesheet" href="#HOST#/css/content-tools.min.css">`, 1)
+		html = strings.Replace(html, `#SCRIPTS#`, getScripts(), 1)
+	} else {
+		html = strings.Replace(html, `#CSS#`, "", 1)
+		html = strings.Replace(html, `#SCRIPTS#`, "", 1)
+	}
+	html = strings.ReplaceAll(html, `#HOST#`, domain)
 	html = strings.ReplaceAll(html, `#TITLE#`, page.Title)
 	html = strings.ReplaceAll(html, `#TOPMENU#`, page.Title)
 	html = strings.ReplaceAll(html, `#CONTENT#`, page.Content)
@@ -60,6 +69,18 @@ func ReplaceTokens(html string, page page.Info) string {
 	html = strings.ReplaceAll(html, `#DAY#`, fmt.Sprint(day))
 	html = strings.ReplaceAll(html, `#MONTH#`, fmt.Sprint(month))
 	html = strings.ReplaceAll(html, `#YEAR#`, fmt.Sprint(year))
-	html = strings.ReplaceAll(html, `#SCRIPTS#`, page.Title)
+	html = strings.ReplaceAll(html, `#ARCHIVE#`, "Genetate archive content")
+	html = strings.ReplaceAll(html, `#RECENT#`, "Genetate recent posts content")
+	html = strings.ReplaceAll(html, `#CATEGORIES#`, "Genetate category list")
+	return html
+}
+
+func getScripts() string {
+	scripts := []string{"content-tools.min.js", "cloudinary.js", "editor.js", "axios.min.js", "common.js"}
+	template := `<script src="#HOST#/%s"/>\n`
+	html := ""
+	for s := range scripts {
+		html += fmt.Sprintf(template, s)
+	}
 	return html
 }
