@@ -66,21 +66,26 @@ func TestGeneratePages(t *testing.T) {
 	for a := 0; a < 4; a++ {
 		id++
 		aid := id
-		addPage(fmt.Sprintf("Page %d", a), aid, 0, "home")
+		addPage(fmt.Sprintf("%d", a), aid, 0, "home")
 		for b := 0; b < 4; b++ {
 			id++
 			bid := id
-			addPage(fmt.Sprintf("Page %d-%d", a, b), bid, aid, "page")
+			addPage(fmt.Sprintf("%d-%d", a, b), bid, aid, "page")
 			for c := 0; c < 4; c++ {
 				id++
 				cid := id
-				addPage(fmt.Sprintf("Page %d-%d-%d", a, b, c), cid, bid, "post")
+				addPage(fmt.Sprintf("%d-%d-%d", a, b, c), cid, bid, "post")
 			}
 		}
 	}
+	SaveData("test")
 }
 
-func addPage(title string, id int, parent int, template string) {
-	pages = append(pages, Info{ID: id, Parent: parent, Title: title, Content: title, Template: template})
+func addPage(route string, id int, parent int, template string) {
+	title := "Page " + route
+	if route == "0" {
+		route = ""
+	}
+	pages = append(pages, Info{ID: id, Parent: parent, Title: title, Content: title, Template: template, Route: "/" + route})
 	SaveContent("test", id, title)
 }
