@@ -77,6 +77,14 @@ func LoadContent(domain string, id int) string {
 	return string(content)
 }
 
+// SaveContent saves page content to a file
+func SaveContent(domain string, id int, content string) {
+	err := ioutil.WriteFile(fmt.Sprintf("%s%s/pages/%d.html", files.Root, domain, id), []byte(content), 0660)
+	if err != nil {
+		panic(err)
+	}
+}
+
 const pagesFile = "/data/pages.json"
 
 // LoadData loads the data from the pages data file
@@ -84,21 +92,29 @@ func LoadData(domain string) {
 	data, err := ioutil.ReadFile(files.Root + domain + pagesFile)
 	if err != nil {
 		pages = []Info{Info{}}
-		b, _ := json.Marshal(pages)
-		data = b
-		err := ioutil.WriteFile(files.Root+domain+pagesFile, b, 0660)
+		SaveData(domain)
+	} else {
+		err = json.Unmarshal(data, &pages)
 		if err != nil {
 			panic(err)
 		}
 	}
-	err = json.Unmarshal(data, &pages)
+}
+
+// SaveData saves the pages data to a file
+func SaveData(domain string) {
+	b, _ := json.Marshal(pages)
+	err := ioutil.WriteFile(files.Root+domain+pagesFile, b, 0660)
 	if err != nil {
 		panic(err)
 	}
 }
 
 // Save a page or post
-func Save(info Info, saveContent bool) int {
+func Save(domain string, info Info, saveContent bool) int {
+	if saveContent {
+		SaveContent(domain, info.ID, info.Content)
+	}
 	return 1
 }
 
