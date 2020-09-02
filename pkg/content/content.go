@@ -29,7 +29,7 @@ func ReplaceTokens(scheme string, domain string, html string, p page.Info) strin
 	html = strings.ReplaceAll(html, `#YEAR#`, fmt.Sprint(year))
 	html = strings.ReplaceAll(html, `#ARCHIVE#`, "Generate archive content")
 	html = strings.ReplaceAll(html, `#RECENT#`, "Generate recent posts content")
-	html = strings.ReplaceAll(html, `#CATEGORIES#`, strings.Join(getCategoryLinks([]string{}, p, baseLink, 2), ""))
+	html = strings.ReplaceAll(html, `#CATEGORIES#`, strings.Join(getCategoryLinks(p, baseLink, 2), ""))
 	return html
 }
 
@@ -67,14 +67,15 @@ func getSubPageLinks(p page.Info, base string, depth int) []string {
 	return scanSubPages(pages, base, depth, "-")
 }
 
-func getCategoryLinks(links []string, p page.Info, base string, depth int) []string {
+func getCategoryLinks(p page.Info, base string, depth int) []string {
+	links := []string{}
 	cats := page.GetCategoryPages(p.ID, page.Published)
 	for _, c := range cats {
 		if c.Parent > 0 {
 			// Subcategories are created by setting the Category value to the parent category page ID
 			subCatLinks := ""
 			if depth > 1 {
-				subCatLinks = strings.Join(getCategoryLinks([]string{}, c, base, depth-1), "")
+				subCatLinks = strings.Join(getCategoryLinks(c, base, depth-1), "")
 			}
 			links = append(links, fmt.Sprintf("<li>%s%s</li>\n", getHref(c, p.Route, base), subCatLinks))
 		}
