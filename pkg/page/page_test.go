@@ -66,15 +66,39 @@ func TestGeneratePages(t *testing.T) {
 	for a := 0; a < 4; a++ {
 		id++
 		aid := id
-		addPage(fmt.Sprintf("%d", a), aid, 0, "home")
+		addPage("Page ", fmt.Sprintf("%d", a), aid, 0, "home", 0)
 		for b := 0; b < 4; b++ {
 			id++
 			bid := id
-			addPage(fmt.Sprintf("%d-%d", a, b), bid, aid, "page")
+			addPage("Page ", fmt.Sprintf("%d-%d", a, b), bid, aid, "page", 0)
 			for c := 0; c < 4; c++ {
 				id++
 				cid := id
-				addPage(fmt.Sprintf("%d-%d-%d", a, b, c), cid, bid, "post")
+				addPage("Page ", fmt.Sprintf("%d-%d-%d", a, b, c), cid, bid, "post", 0)
+			}
+		}
+	}
+	SaveData("test")
+}
+
+func TestGenerateCategoryPages(t *testing.T) {
+	files.Root = "../files/"
+	LoadData("test")
+	// Set the root category page
+	id := 999
+	addPage("Categories ", "cats", id, 0, "category", 0)
+	for a := 0; a < 4; a++ {
+		id++
+		aid := id
+		addPage("Category ", fmt.Sprintf("cat-%d", aid), aid, 999, "category", 0)
+		for b := 0; b < 4; b++ {
+			id++
+			bid := id
+			addPage("Category ", fmt.Sprintf("cat-%d-%d", aid, bid), bid, aid, "category", aid)
+			for c := 0; c < 4; c++ {
+				id++
+				cid := id
+				addPage("Category ", fmt.Sprintf("cat-%d-%d-%d", aid, bid, cid), cid, bid, "category", bid)
 			}
 		}
 	}
@@ -90,11 +114,11 @@ func TestGetPages(t *testing.T) {
 	}
 }
 
-func addPage(route string, id int, parent int, template string) {
-	title := "Page " + route
+func addPage(title string, route string, id int, parent int, template string, category int) {
+	title += route
 	if route == "0" {
 		route = ""
 	}
-	pages = append(pages, Info{ID: id, Parent: parent, Title: title, Content: title, Template: template, Route: "/" + route, Status: Published})
+	Add(Info{ID: id, Parent: parent, Title: title, Content: title, Template: template, Route: "/" + route, Status: Published, Category: category})
 	SaveContent("test", id, title)
 }

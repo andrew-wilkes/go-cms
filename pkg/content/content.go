@@ -29,7 +29,7 @@ func ReplaceTokens(scheme string, domain string, html string, p page.Info) strin
 	html = strings.ReplaceAll(html, `#YEAR#`, fmt.Sprint(year))
 	html = strings.ReplaceAll(html, `#ARCHIVE#`, "Generate archive content")
 	html = strings.ReplaceAll(html, `#RECENT#`, "Generate recent posts content")
-	html = strings.ReplaceAll(html, `#CATEGORIES#`, "Generate category list")
+	html = strings.ReplaceAll(html, `#CATEGORIES#`, getCategoryLinks(p, baseLink))
 	return html
 }
 
@@ -49,6 +49,17 @@ func getPageLinks(p page.Info, base string) string {
 	pages := page.GetPages(p.Parent, page.Published)
 	for _, item := range pages {
 		links += fmt.Sprintf("<li>%s</li>\n", getHref(item, p.Route, base))
+	}
+	return links
+}
+
+func getCategoryLinks(p page.Info, base string) string {
+	links := ""
+	cats := page.GetCategoryPages(p.Category, page.Published)
+	for _, c := range cats {
+		if c.Parent > 0 {
+			links += fmt.Sprintf("<li>%s</li>\n", getHref(c, p.Route, base))
+		}
 	}
 	return links
 }

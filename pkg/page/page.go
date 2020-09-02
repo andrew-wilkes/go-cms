@@ -128,3 +128,19 @@ func GetPages(parent int, status Status) []Info {
 	}
 	return list
 }
+
+// GetCategoryPages returns a slice of category pages in a category
+func GetCategoryPages(id int, status Status) []Info {
+	list := []Info{}
+	for _, p := range pages {
+		if p.Category == id && p.Status == status && p.Template == "category" {
+			list = append(list, p)
+		}
+	}
+	return list
+}
+
+// Add new page data
+func Add(newPage Info) {
+	pages = append(pages, newPage)
+}

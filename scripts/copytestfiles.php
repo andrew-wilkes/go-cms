@@ -24,13 +24,16 @@ array_walk($files, 'copy_files', "$dest/pages/");
 $files =  glob("$src/templates/*.html");
 array_walk($files, 'copy_files', "$dest/templates/");
 
-$j = "/data/pages.json";
-$src .= $j;
-$dest .= $j;
-if (file_exists($src))
-    copy($src, $dest);
-else
-    echo "Missing file: $src\n\n";
+copy_file($src, $dest, "/data/pages.json");
+
+function copy_file($src, $dest, $jsonPath) {
+    $src .= $jsonPath;
+    $dest .= $jsonPath;
+    if (file_exists($src))
+        copy($src, $dest);
+    else
+        echo "Missing file: $src\n\n";
+}
 
 function copy_files($src, $key, $dest) {
     copy($src, $dest . basename($src));
