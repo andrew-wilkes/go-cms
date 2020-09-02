@@ -122,7 +122,7 @@ func Save(domain string, info Info, saveContent bool) int {
 func GetPages(parent int, status Status) []Info {
 	list := []Info{}
 	for _, p := range pages {
-		if p.Parent == parent && p.Status == status {
+		if p.Parent == parent && p.Status == status && p.Template != "category" {
 			list = append(list, p)
 		}
 	}

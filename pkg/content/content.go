@@ -21,7 +21,7 @@ func ReplaceTokens(scheme string, domain string, html string, p page.Info) strin
 	}
 	html = strings.ReplaceAll(html, `#HOST#`, baseLink)
 	html = strings.ReplaceAll(html, `#TITLE#`, p.Title)
-	html = strings.ReplaceAll(html, `#TOPMENU#`, getPageLinks(p, baseLink))
+	html = strings.ReplaceAll(html, `#TOPMENU#`, strings.Join(getPageLinks([]string{}, p, baseLink, 2), ""))
 	html = strings.ReplaceAll(html, `#CONTENT#`, p.Content)
 	html = strings.ReplaceAll(html, `#FOOTERMENU#`, p.Title)
 	html = strings.ReplaceAll(html, `#DAY#`, fmt.Sprint(day))
@@ -43,12 +43,25 @@ func getScripts() string {
 	return html
 }
 
-func getPageLinks(p page.Info, base string) string {
+func getPageLinks(links []string, p page.Info, base string, depth int) []string {
 	// Return links to pages with a common parent
-	links := ""
 	pages := page.GetPages(p.Parent, page.Published)
+	return scanSubPages([]string{}, pages, base, depth, p.Route)
+}
+
+func getSubPageLinks(links []string, p page.Info, base string, depth int) []string {
+	// Return links to pages with p.ID as parent
+	pages := page.GetPages(p.ID, page.Published)
+	return scanSubPages([]string{}, pages, base, depth, "-")
+}
+
+func scanSubPages(links []string, pages []page.Info, base string, depth int, route string) []string {
 	for _, item := range pages {
-		links += fmt.Sprintf("<li>%s</li>\n", getHref(item, p.Route, base))
+		subPageLinks := ""
+		if depth > 1 {
+			subPageLinks = strings.Join(getSubPageLinks([]string{}, item, base, depth-1), "")
+		}
+		links = append(links, fmt.Sprintf("<li>%s%s</li>\n", getHref(item, route, base), subPageLinks))
 	}
 	return links
 }
@@ -58,11 +71,11 @@ func getCategoryLinks(links []string, p page.Info, base string, depth int) []str
 	for _, c := range cats {
 		if c.Parent > 0 {
 			// Subcategories are created by setting the Category value to the parent category page ID
-			subCatLinks := []string{}
+			subCatLinks := ""
 			if depth > 1 {
-				subCatLinks = getCategoryLinks(subCatLinks, c, base, depth-1)
+				subCatLinks = strings.Join(getCategoryLinks([]string{}, c, base, depth-1), "")
 			}
-			links = append(links, fmt.Sprintf("<li>%s%s</li>\n", getHref(c, p.Route, base), strings.Join(subCatLinks, "")))
+			links = append(links, fmt.Sprintf("<li>%s%s</li>\n", getHref(c, p.Route, base), subCatLinks))
 		}
 	}
 	return links
