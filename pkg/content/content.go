@@ -21,7 +21,7 @@ func ReplaceTokens(scheme string, domain string, html string, p page.Info) strin
 	}
 	html = strings.ReplaceAll(html, `#HOST#`, baseLink)
 	html = strings.ReplaceAll(html, `#TITLE#`, p.Title)
-	html = strings.ReplaceAll(html, `#TOPMENU#`, strings.Join(getPageLinks([]string{}, p, baseLink, 2), ""))
+	html = strings.ReplaceAll(html, `#TOPMENU#`, strings.Join(getPageLinks(p, baseLink, 2), ""))
 	html = strings.ReplaceAll(html, `#CONTENT#`, p.Content)
 	html = strings.ReplaceAll(html, `#FOOTERMENU#`, p.Title)
 	html = strings.ReplaceAll(html, `#DAY#`, fmt.Sprint(day))
@@ -43,27 +43,28 @@ func getScripts() string {
 	return strings.Join(html, "\n")
 }
 
-func getPageLinks(links []string, p page.Info, base string, depth int) []string {
+func getPageLinks(p page.Info, base string, depth int) []string {
 	// Return links to pages with a common parent
 	pages := page.GetPages(p.Parent, page.Published)
-	return scanSubPages([]string{}, pages, base, depth, p.Route)
+	return scanSubPages(pages, base, depth, p.Route)
 }
 
-func getSubPageLinks(links []string, p page.Info, base string, depth int) []string {
-	// Return links to pages with p.ID as parent
-	pages := page.GetPages(p.ID, page.Published)
-	return scanSubPages([]string{}, pages, base, depth, "-")
-}
-
-func scanSubPages(links []string, pages []page.Info, base string, depth int, route string) []string {
+func scanSubPages(pages []page.Info, base string, depth int, route string) []string {
+	links := []string{}
 	for _, item := range pages {
 		subPageLinks := ""
 		if depth > 1 {
-			subPageLinks = strings.Join(getSubPageLinks([]string{}, item, base, depth-1), "")
+			subPageLinks = strings.Join(getSubPageLinks(item, base, depth-1), "")
 		}
 		links = append(links, fmt.Sprintf("<li>%s%s</li>\n", getHref(item, route, base), subPageLinks))
 	}
 	return links
+}
+
+func getSubPageLinks(p page.Info, base string, depth int) []string {
+	// Return links to pages with p.ID as parent
+	pages := page.GetPages(p.ID, page.Published)
+	return scanSubPages(pages, base, depth, "-")
 }
 
 func getCategoryLinks(links []string, p page.Info, base string, depth int) []string {
