@@ -35,12 +35,12 @@ func ReplaceTokens(scheme string, domain string, html string, p page.Info) strin
 
 func getScripts() string {
 	scripts := []string{"content-tools.min.js", "cloudinary.js", "editor.js", "axios.min.js", "common.js"}
-	template := `<script src="#HOST#/js/%s"/>\n`
-	html := ""
+	template := `<script src="#HOST#/js/%s"/>`
+	html := []string{}
 	for s := range scripts {
-		html += fmt.Sprintf(template, s)
+		html = append(html, fmt.Sprintf(template, s))
 	}
-	return html
+	return strings.Join(html, "\n")
 }
 
 func getPageLinks(links []string, p page.Info, base string, depth int) []string {
