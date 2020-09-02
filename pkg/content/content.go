@@ -9,7 +9,8 @@ import (
 )
 
 // ReplaceTokens in HTML
-func ReplaceTokens(domain string, html string, page page.Info) string {
+func ReplaceTokens(scheme string, domain string, html string, p page.Info) string {
+	baseLink := fmt.Sprintf("%s://%s", scheme, domain)
 	year, month, day := time.Now().Date()
 	if user.GetStatus().LoggedIn {
 		html = strings.Replace(html, `#CSS#`, `<link rel="stylesheet" href="#HOST#/css/content-tools.min.css">`, 1)
@@ -18,11 +19,11 @@ func ReplaceTokens(domain string, html string, page page.Info) string {
 		html = strings.Replace(html, `#CSS#`, "", 1)
 		html = strings.Replace(html, `#SCRIPTS#`, "", 1)
 	}
-	html = strings.ReplaceAll(html, `#HOST#`, domain)
-	html = strings.ReplaceAll(html, `#TITLE#`, page.Title)
-	html = strings.ReplaceAll(html, `#TOPMENU#`, page.Title)
-	html = strings.ReplaceAll(html, `#CONTENT#`, page.Content)
-	html = strings.ReplaceAll(html, `#FOOTERMENU#`, page.Title)
+	html = strings.ReplaceAll(html, `#HOST#`, baseLink)
+	html = strings.ReplaceAll(html, `#TITLE#`, p.Title)
+	html = strings.ReplaceAll(html, `#TOPMENU#`, getPageLinks(p, baseLink))
+	html = strings.ReplaceAll(html, `#CONTENT#`, p.Content)
+	html = strings.ReplaceAll(html, `#FOOTERMENU#`, p.Title)
 	html = strings.ReplaceAll(html, `#DAY#`, fmt.Sprint(day))
 	html = strings.ReplaceAll(html, `#MONTH#`, fmt.Sprint(month))
 	html = strings.ReplaceAll(html, `#YEAR#`, fmt.Sprint(year))
@@ -40,4 +41,22 @@ func getScripts() string {
 		html += fmt.Sprintf(template, s)
 	}
 	return html
+}
+
+func getPageLinks(p page.Info, base string) string {
+	// Return links to pages with a common parent
+	links := ""
+	pages := page.GetPages(p.Parent, page.Published)
+	for _, item := range pages {
+		links += fmt.Sprintf("<li>%s</li>\n", getHref(item, p.Route, base))
+	}
+	return links
+}
+
+func getHref(p page.Info, route string, base string) string {
+	href := p.Title
+	if p.Route != route {
+		href = fmt.Sprintf(`<a href="%s%s">%s</a>`, base, p.Route, href)
+	}
+	return href
 }

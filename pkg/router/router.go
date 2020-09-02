@@ -17,6 +17,7 @@ type Request struct {
 	Domain   string
 	Route    string
 	Method   string
+	Scheme   string
 	GetArgs  map[string]string
 	PostData map[string]json.RawMessage
 }
@@ -31,7 +32,7 @@ func Process(r Request) ([]string, string) {
 		html = "Page not found at: " + r.Route
 	} else {
 		template := GetTemplate(r.Domain, page.Template)
-		html = content.ReplaceTokens(r.Domain, template, page)
+		html = content.ReplaceTokens(r.Scheme, r.Domain, template, page)
 	}
 	return headers, html
 }

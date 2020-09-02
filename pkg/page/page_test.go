@@ -61,7 +61,7 @@ func TestSaveContent(t *testing.T) {
 func TestGeneratePages(t *testing.T) {
 	files.Root = "../files/"
 	// Set the root empty page
-	pages = []Info{Info{}}
+	pages = []Info{Info{Parent: -1}}
 	id := 0
 	for a := 0; a < 4; a++ {
 		id++
@@ -81,11 +81,20 @@ func TestGeneratePages(t *testing.T) {
 	SaveData("test")
 }
 
+func TestGetPages(t *testing.T) {
+	files.Root = "../files/"
+	LoadData("test")
+	list := GetPages(0, Published)
+	if len(list) != 4 {
+		t.Errorf("Got length of %v want 4", len(list))
+	}
+}
+
 func addPage(route string, id int, parent int, template string) {
 	title := "Page " + route
 	if route == "0" {
 		route = ""
 	}
-	pages = append(pages, Info{ID: id, Parent: parent, Title: title, Content: title, Template: template, Route: "/" + route})
+	pages = append(pages, Info{ID: id, Parent: parent, Title: title, Content: title, Template: template, Route: "/" + route, Status: Published})
 	SaveContent("test", id, title)
 }

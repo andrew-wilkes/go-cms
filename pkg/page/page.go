@@ -118,7 +118,13 @@ func Save(domain string, info Info, saveContent bool) int {
 	return 1
 }
 
-// List - Get a list of all pages
-func List() []Info {
-	return []Info{Info{}, Info{}}
+// GetPages returns a slice of pages data
+func GetPages(parent int, status Status) []Info {
+	list := []Info{}
+	for _, p := range pages {
+		if p.Parent == parent && p.Status == status {
+			list = append(list, p)
+		}
+	}
+	return list
 }
