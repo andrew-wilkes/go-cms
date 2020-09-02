@@ -90,7 +90,7 @@ func TestGenerateCategoryPages(t *testing.T) {
 	for a := 0; a < 4; a++ {
 		id++
 		aid := id
-		addPage("Category ", fmt.Sprintf("cat-%d", aid), aid, 999, "category", 0)
+		addPage("Category ", fmt.Sprintf("cat-%d", aid), aid, 999, "category", 999)
 		for b := 0; b < 4; b++ {
 			id++
 			bid := id
