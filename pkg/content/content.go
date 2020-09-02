@@ -21,7 +21,7 @@ func ReplaceTokens(scheme string, domain string, html string, p page.Info) strin
 	}
 	html = strings.ReplaceAll(html, `#HOST#`, baseLink)
 	html = strings.ReplaceAll(html, `#TITLE#`, p.Title)
-	html = strings.ReplaceAll(html, `#TOPMENU#`, strings.Join(getPageLinks(p, baseLink, 2), ""))
+	html = strings.ReplaceAll(html, `#TOPMENU#`, strings.Join(getPageLinks(p, baseLink, 2), "\n"))
 	html = strings.ReplaceAll(html, `#CONTENT#`, p.Content)
 	html = strings.ReplaceAll(html, `#FOOTERMENU#`, p.Title)
 	html = strings.ReplaceAll(html, `#DAY#`, fmt.Sprint(day))
@@ -29,7 +29,7 @@ func ReplaceTokens(scheme string, domain string, html string, p page.Info) strin
 	html = strings.ReplaceAll(html, `#YEAR#`, fmt.Sprint(year))
 	html = strings.ReplaceAll(html, `#ARCHIVE#`, "Generate archive content")
 	html = strings.ReplaceAll(html, `#RECENT#`, "Generate recent posts content")
-	html = strings.ReplaceAll(html, `#CATEGORIES#`, strings.Join(getCategoryLinks(p, baseLink, 2), ""))
+	html = strings.ReplaceAll(html, `#CATEGORIES#`, strings.Join(getCategoryLinks(p, baseLink, 2), "\n"))
 	return html
 }
 
@@ -54,7 +54,7 @@ func scanSubPages(pages []page.Info, base string, depth int, route string) []str
 	for _, item := range pages {
 		subPageLinks := ""
 		if depth > 1 {
-			subPageLinks = strings.Join(getSubPageLinks(item, base, depth-1), "")
+			subPageLinks = fmt.Sprintf("\n<ul>\n%s</ul>\n", strings.Join(getSubPageLinks(item, base, depth-1), ""))
 		}
 		links = append(links, fmt.Sprintf("<li>%s%s</li>\n", getHref(item, route, base), subPageLinks))
 	}
@@ -75,7 +75,7 @@ func getCategoryLinks(p page.Info, base string, depth int) []string {
 			// Subcategories are created by setting the Category value to the parent category page ID
 			subCatLinks := ""
 			if depth > 1 {
-				subCatLinks = strings.Join(getCategoryLinks(c, base, depth-1), "")
+				subCatLinks = fmt.Sprintf("\n<ul>%s</ul>\n", strings.Join(getCategoryLinks(c, base, depth-1), ""))
 			}
 			links = append(links, fmt.Sprintf("<li>%s%s</li>\n", getHref(c, p.Route, base), subCatLinks))
 		}
