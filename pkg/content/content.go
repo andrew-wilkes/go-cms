@@ -10,7 +10,7 @@ import (
 
 // ReplaceTokens in HTML
 func ReplaceTokens(scheme string, domain string, html string, p page.Info) string {
-	baseLink := fmt.Sprintf("%s://%s", scheme, domain)
+	baseURL := fmt.Sprintf("%s://%s", scheme, domain)
 	year, month, day := time.Now().Date()
 	if user.GetStatus().LoggedIn {
 		html = strings.Replace(html, `#CSS#`, `<link rel="stylesheet" href="#HOST#/css/content-tools.min.css">`, 1)
@@ -19,9 +19,10 @@ func ReplaceTokens(scheme string, domain string, html string, p page.Info) strin
 		html = strings.Replace(html, `#CSS#`, "", 1)
 		html = strings.Replace(html, `#SCRIPTS#`, "", 1)
 	}
-	html = strings.ReplaceAll(html, `#HOST#`, baseLink)
+	html = strings.ReplaceAll(html, `#HOST#`, baseURL)
+	html = strings.ReplaceAll(html, `#HOME#`, getHref(page.GetPages(0, page.Published)[0], p.Route, baseURL))
 	html = strings.ReplaceAll(html, `#TITLE#`, p.Title)
-	html = strings.ReplaceAll(html, `#TOPMENU#`, strings.Join(getPageLinks(p, baseLink, 2), "\n"))
+	html = strings.ReplaceAll(html, `#TOPMENU#`, strings.Join(getPageLinks(p, baseURL, 2), "\n"))
 	html = strings.ReplaceAll(html, `#CONTENT#`, p.Content)
 	html = strings.ReplaceAll(html, `#FOOTERMENU#`, p.Title)
 	html = strings.ReplaceAll(html, `#DAY#`, fmt.Sprint(day))
@@ -29,7 +30,7 @@ func ReplaceTokens(scheme string, domain string, html string, p page.Info) strin
 	html = strings.ReplaceAll(html, `#YEAR#`, fmt.Sprint(year))
 	html = strings.ReplaceAll(html, `#ARCHIVE#`, "Generate archive content")
 	html = strings.ReplaceAll(html, `#RECENT#`, "Generate recent posts content")
-	html = strings.ReplaceAll(html, `#CATEGORIES#`, strings.Join(getCategoryLinks(p, baseLink, 2), "\n"))
+	html = strings.ReplaceAll(html, `#CATEGORIES#`, strings.Join(getCategoryLinks(p, baseURL, 2), "\n"))
 	return html
 }
 
