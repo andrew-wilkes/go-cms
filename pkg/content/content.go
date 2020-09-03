@@ -45,6 +45,14 @@ func getScripts() string {
 	return strings.Join(html, "\n")
 }
 
+func getArchiveLinks(parts []string, baseURL string) string {
+	// Change page title
+	// if len(parts) == 0 Get all
+	// if len(parts) == 1 Get year
+	// if len(parts) == 2 Get month
+	return ""
+}
+
 func getPageLinks(p page.Info, baseURL string, depth int) []string {
 	// Return links to pages with a common parent
 	pages := page.GetPages(p.Parent, page.Published)
