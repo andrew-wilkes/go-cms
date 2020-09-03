@@ -16,7 +16,12 @@ func TestGetByRoute(t *testing.T) {
 
 func TestGet(t *testing.T) {
 	files.Root = "../files/"
-	Get("test", 1, false)
+	p := Get("test", 2, false)
+	title := p.Title
+	want := "Page 0-0"
+	if title != want {
+		t.Errorf("Want %s got %s", want, title)
+	}
 }
 
 func TestSaveData(t *testing.T) {

@@ -21,6 +21,7 @@ func ReplaceTokens(scheme string, domain string, html string, p page.Info) strin
 	}
 	html = strings.ReplaceAll(html, `#HOST#`, baseURL)
 	html = strings.ReplaceAll(html, `#HOME#`, getHref(page.GetPages(0, page.Published)[0], p.Route, baseURL))
+	html = strings.ReplaceAll(html, `#BREADCRUMB#`, GetBreadcrumbLinks(domain, p, baseURL))
 	html = strings.ReplaceAll(html, `#TITLE#`, p.Title)
 	html = strings.ReplaceAll(html, `#TOPMENU#`, strings.Join(getPageLinks(p, baseURL, 2), "\n"))
 	html = strings.ReplaceAll(html, `#CONTENT#`, p.Content)
@@ -44,20 +45,20 @@ func getScripts() string {
 	return strings.Join(html, "\n")
 }
 
-func getPageLinks(p page.Info, base string, depth int) []string {
+func getPageLinks(p page.Info, baseURL string, depth int) []string {
 	// Return links to pages with a common parent
 	pages := page.GetPages(p.Parent, page.Published)
-	return scanSubPages(pages, base, depth, p.Route)
+	return scanSubPages(pages, baseURL, depth, p.Route)
 }
 
-func scanSubPages(pages []page.Info, base string, depth int, route string) []string {
+func scanSubPages(pages []page.Info, baseURL string, depth int, route string) []string {
 	links := []string{}
 	for _, item := range pages {
 		subPageLinks := ""
 		if depth > 1 {
-			subPageLinks = fmt.Sprintf("\n<ul>\n%s</ul>\n", strings.Join(getSubPageLinks(item, base, depth-1), ""))
+			subPageLinks = fmt.Sprintf("\n<ul>\n%s</ul>\n", strings.Join(getSubPageLinks(item, baseURL, depth-1), ""))
 		}
-		links = append(links, fmt.Sprintf("<li>%s%s</li>\n", getHref(item, route, base), subPageLinks))
+		links = append(links, fmt.Sprintf("<li>%s%s</li>\n", getHref(item, route, baseURL), subPageLinks))
 	}
 	return links
 }
@@ -84,10 +85,26 @@ func getCategoryLinks(p page.Info, base string, depth int) []string {
 	return links
 }
 
-func getHref(p page.Info, route string, base string) string {
+func getHref(p page.Info, route string, baseURL string) string {
 	href := p.Title
 	if p.Route != route {
-		href = fmt.Sprintf(`<a href="%s%s">%s</a>`, base, p.Route, href)
+		href = fmt.Sprintf(`<a href="%s%s">%s</a>`, baseURL, p.Route, href)
 	}
 	return href
+}
+
+// GetBreadcrumbLinks returns a trail of links from the home page to the current page
+func GetBreadcrumbLinks(domain string, p page.Info, baseURL string) string {
+	pages := []page.Info{p}
+	pid := p.Parent
+	for pid > 0 {
+		parentPage := page.Get(domain, pid, false)
+		pages = append([]page.Info{parentPage}, pages...)
+		pid = parentPage.Parent
+	}
+	links := []string{}
+	for _, bp := range pages {
+		links = append(links, getHref(bp, p.Route, baseURL))
+	}
+	return strings.Join(links, " > ")
 }

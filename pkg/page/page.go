@@ -44,7 +44,7 @@ type Info struct {
 
 // Get by ID a page or post
 func Get(domain string, id int, getContent bool) Info {
-	return find(domain, id, "", getContent)
+	return find(domain, id, "-", getContent)
 }
 
 // GetByRoute a page or post
