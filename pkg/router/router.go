@@ -14,16 +14,18 @@ import (
 
 // Request type
 type Request struct {
-	Domain   string
-	Route    string
-	Method   string
-	Scheme   string
-	GetArgs  map[string]string
-	PostData map[string]json.RawMessage
+	Domain    string
+	Route     string
+	SubRoutes []string
+	Method    string
+	Scheme    string
+	GetArgs   map[string]string
+	PostData  map[string]json.RawMessage
 }
 
 // Process a request
 func Process(r Request) ([]string, string) {
+	r = ExtractSubRoutes(r)
 	headers := []string{}
 	html := ""
 	page := page.GetByRoute(r.Domain, r.Route, true)
@@ -35,6 +37,20 @@ func Process(r Request) ([]string, string) {
 		html = content.ReplaceTokens(r.Scheme, r.Domain, template, page)
 	}
 	return headers, html
+}
+
+// ExtractSubRoutes scans the route for special prefixes and uses the rest of the route to extract the subroutes
+func ExtractSubRoutes(r Request) Request {
+	stems := []string{"/archive"}
+	for _, stem := range stems {
+		if strings.HasPrefix(r.Route, stem) {
+			tail := strings.Replace(r.Route, stem, "", 1)
+			r.SubRoutes = strings.Split(tail, "/")[1:]
+			r.Route = stem
+			break
+		}
+	}
+	return r
 }
 
 // GetTemplate for page (this is a recursive function to allow for nesting of templates)

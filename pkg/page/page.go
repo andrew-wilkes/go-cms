@@ -40,8 +40,8 @@ type Info struct {
 	Category    int
 	Type        Type
 	Template    string
-	PubTime     int64
-	UpdateTime  int64
+	PubDate     time.Time
+	UpdateDate  time.Time
 }
 
 // GetByID by ID a page or post
@@ -124,11 +124,16 @@ func Save(domain string, info Info, saveContent bool) int {
 func GetPages(parent int, status Status) []Info {
 	list := []Info{}
 	for _, p := range pages {
-		if p.Parent == parent && p.Status == status && p.Template != "category" {
+		if p.Parent == parent && p.Status == status && p.Template == "post" || p.Template == "page" {
 			list = append(list, p)
 		}
 	}
 	return list
+}
+
+// GetAllPages return all the page data
+func GetAllPages() []Info {
+	return pages
 }
 
 // GetCategoryPages returns a slice of category pages in a category
@@ -144,6 +149,5 @@ func GetCategoryPages(id int, status Status) []Info {
 
 // Add new page data
 func Add(newPage Info) {
-	newPage.PubTime = time.Now().Unix()
 	pages = append(pages, newPage)
 }
