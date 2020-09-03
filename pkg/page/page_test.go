@@ -14,9 +14,9 @@ func TestGetByRoute(t *testing.T) {
 	GetByRoute("test", "test_page", false)
 }
 
-func TestGet(t *testing.T) {
+func TestGetByID(t *testing.T) {
 	files.Root = "../files/"
-	p := Get("test", 2, false)
+	p := GetByID("test", 2, false)
 	title := p.Title
 	want := "Page 0-0"
 	if title != want {

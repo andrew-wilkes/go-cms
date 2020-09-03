@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"gocms/pkg/files"
 	"io/ioutil"
+	"time"
 )
 
 // Status type
@@ -39,11 +40,12 @@ type Info struct {
 	Category    int
 	Type        Type
 	Template    string
-	Timestamp   int
+	PubTime     int64
+	UpdateTime  int64
 }
 
-// Get by ID a page or post
-func Get(domain string, id int, getContent bool) Info {
+// GetByID by ID a page or post
+func GetByID(domain string, id int, getContent bool) Info {
 	return find(domain, id, "-", getContent)
 }
 
@@ -142,5 +144,6 @@ func GetCategoryPages(id int, status Status) []Info {
 
 // Add new page data
 func Add(newPage Info) {
+	newPage.PubTime = time.Now().Unix()
 	pages = append(pages, newPage)
 }

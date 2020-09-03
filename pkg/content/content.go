@@ -98,7 +98,7 @@ func GetBreadcrumbLinks(domain string, p page.Info, baseURL string) string {
 	pages := []page.Info{p}
 	pid := p.Parent
 	for pid > 0 {
-		parentPage := page.Get(domain, pid, false)
+		parentPage := page.GetByID(domain, pid, false)
 		pages = append([]page.Info{parentPage}, pages...)
 		pid = parentPage.Parent
 	}
