@@ -1,14 +1,15 @@
 package user
 
-type status struct {
+// Status of user
+type Status struct {
 	LoggedIn bool
 	LastTime int
 	LastIP   int
 }
 
 // GetStatus - returns the login status of the user
-func GetStatus() {
-
+func GetStatus() Status {
+	return Status{}
 }
 
 // LogOn to the system

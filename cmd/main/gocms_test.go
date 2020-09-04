@@ -16,7 +16,7 @@ func TestProcessInput(t *testing.T) {
 
 func TestParseURI(t *testing.T) {
 	r := ParseURI("test/page?a=X&b=Y&c=Z")
-	if r.Route != "test/page" && r.Params["a"] != "X" && r.Params["b"] != "Y" && r.Params["c"] != "Z" {
+	if r.Route != "test/page" && r.GetArgs["a"] != "X" && r.GetArgs["b"] != "Y" && r.GetArgs["c"] != "Z" {
 		t.Errorf("Unexpected result in: %v", r)
 	}
 }

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"gocms/pkg/files"
 	"io/ioutil"
+	"time"
 )
 
 // Status type
@@ -39,12 +40,13 @@ type Info struct {
 	Category    int
 	Type        Type
 	Template    string
-	Timestamp   int
+	PubDate     time.Time
+	UpdateDate  time.Time
 }
 
-// Get by ID a page or post
-func Get(domain string, id int, getContent bool) Info {
-	return find(domain, id, "", getContent)
+// GetByID by ID a page or post
+func GetByID(domain string, id int, getContent bool) Info {
+	return find(domain, id, "-", getContent)
 }
 
 // GetByRoute a page or post
@@ -77,6 +79,14 @@ func LoadContent(domain string, id int) string {
 	return string(content)
 }
 
+// SaveContent saves page content to a file
+func SaveContent(domain string, id int, content string) {
+	err := ioutil.WriteFile(fmt.Sprintf("%s%s/pages/%d.html", files.Root, domain, id), []byte(content), 0660)
+	if err != nil {
+		panic(err)
+	}
+}
+
 const pagesFile = "/data/pages.json"
 
 // LoadData loads the data from the pages data file
@@ -84,25 +94,60 @@ func LoadData(domain string) {
 	data, err := ioutil.ReadFile(files.Root + domain + pagesFile)
 	if err != nil {
 		pages = []Info{Info{}}
-		b, _ := json.Marshal(pages)
-		data = b
-		err := ioutil.WriteFile(files.Root+domain+pagesFile, b, 0660)
+		SaveData(domain)
+	} else {
+		err = json.Unmarshal(data, &pages)
 		if err != nil {
 			panic(err)
 		}
 	}
-	err = json.Unmarshal(data, &pages)
+}
+
+// SaveData saves the pages data to a file
+func SaveData(domain string) {
+	b, _ := json.Marshal(pages)
+	err := ioutil.WriteFile(files.Root+domain+pagesFile, b, 0660)
 	if err != nil {
 		panic(err)
 	}
 }
 
 // Save a page or post
-func Save(info Info, saveContent bool) int {
+func Save(domain string, info Info, saveContent bool) int {
+	if saveContent {
+		SaveContent(domain, info.ID, info.Content)
+	}
 	return 1
 }
 
-// List - Get a list of all pages
-func List() []Info {
-	return []Info{Info{}, Info{}}
+// GetPages returns a slice of pages data
+func GetPages(parent int, status Status) []Info {
+	list := []Info{}
+	for _, p := range pages {
+		if p.Parent == parent && p.Status == status && p.Template == "post" || p.Template == "page" {
+			list = append(list, p)
+		}
+	}
+	return list
+}
+
+// GetAllPages return all the page data
+func GetAllPages() []Info {
+	return pages
+}
+
+// GetCategoryPages returns a slice of category pages in a category
+func GetCategoryPages(id int, status Status) []Info {
+	list := []Info{}
+	for _, p := range pages {
+		if p.Category == id && p.Status == status && p.Template == "category" {
+			list = append(list, p)
+		}
+	}
+	return list
+}
+
+// Add new page data
+func Add(newPage Info) {
+	pages = append(pages, newPage)
 }

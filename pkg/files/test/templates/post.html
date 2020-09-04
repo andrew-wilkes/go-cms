@@ -36,7 +36,7 @@ include 'header.php';
 	<p class="meta">Published: <?php echo date('jS F Y', strtotime(Page::get_value('published'))); ?></p>
 
 	<div data-editable data-name="main-content">
-	<?php Page::insert_region_content(); ?>
+#CONTENT#
 	</div>
 
 	<div>
@@ -50,4 +50,4 @@ include 'header.php';
 	</div>
 </div>
 
-<?php include 'footer.php'; ?>
+#T_FOOTER#

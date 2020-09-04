@@ -6,3 +6,6 @@ deploy:
 
 test:
 	go test gocms/cmd/main
+
+copyfiles:
+	php scripts/copytestfiles.php

@@ -1,10 +1,7 @@
-<?php
-Tokens::add(['#TITLE#' => Page::get_value('title')]);
-include 'header.php';
-?>
+#T_HEADER#
 
 <div class="column">
-<?php Page::display_content(); ?>
+#CONTENT#
 
 <div><?php //echo $widgets->insert('main'); ?></div>
 
@@ -12,4 +9,4 @@ include 'header.php';
 
 <div class="column"><?php //echo $widgets->insert('sidebar'); ?></div>
 
-<?php include 'footer.php'; ?>
+#T_FOOTER#
