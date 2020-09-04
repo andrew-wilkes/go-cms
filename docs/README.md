@@ -12,7 +12,7 @@ The website will use an **index.php** file to interface to the app.
 
 ## Deployed Project Structure
 
-Here is an example of the file structure of a deployed procect with one domain:
+Here is an example of the file structure of a deployed project with one domain:
 
     app_folder/app
         domain.tld/
