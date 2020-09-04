@@ -47,6 +47,10 @@ Here is an example of the file structure of a deployed project with one domain:
                 .
                 .
             robots.txt
+            dashboard/
+                front_end_SPA_code
+
+The *dashboard* folder name will be customizable.
 
 ## Installation
 
@@ -58,6 +62,11 @@ The **Makefile** contains commands to run scripts to:
 - copy generated page files for test purposes to the server
 
 The scripts folder contains php scripts that are used for the above tasks. The deploy script has a command line option (-l or --log) to deploy a test version of the installation.
+
+The available **make** commands are:
+- make b
+- make deploy
+- make copy files
 
 ## Testing
 
