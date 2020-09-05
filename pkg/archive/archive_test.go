@@ -16,6 +16,11 @@ func TestGetYears(t *testing.T) {
 	if got != want {
 		t.Errorf("Got %d want %d", got, want)
 	}
+	got = years[2000]
+	want = 20
+	if got != want {
+		t.Errorf("Got %d want %d", got, want)
+	}
 }
 
 func TestGetMonths(t *testing.T) {
@@ -24,6 +29,11 @@ func TestGetMonths(t *testing.T) {
 	months := GetMonths(2000)
 	got := len(months)
 	want := 4
+	if got != want {
+		t.Errorf("Got %d want %d", got, want)
+	}
+	got = months[time.February]
+	want = 5
 	if got != want {
 		t.Errorf("Got %d want %d", got, want)
 	}

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"gocms/pkg/files"
 	"gocms/pkg/page"
+	"gocms/pkg/request"
 	"testing"
 )
 
@@ -13,7 +14,7 @@ func TestReplaceTokens(t *testing.T) {
 	page.LoadData("test")
 	html := "#TITLE# #TOPMENU# #CONTENT# #FOOTERMENU# #DATE# #SCRIPTS#"
 	page := page.Info{Title: "Test", Content: "Content"}
-	content := ReplaceTokens("http", "test", html, page)
+	content := ReplaceTokens(request.Info{Scheme: "http", Domain: "test"}, html, page)
 	got := fmt.Sprintf("%x", md5.Sum([]byte(content)))
 	want := "ccabdae6e8a3dce76ac249c82bb0ed26"
 	if got != want {

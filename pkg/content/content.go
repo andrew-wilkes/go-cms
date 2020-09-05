@@ -2,6 +2,7 @@ package content
 
 import (
 	"fmt"
+	"gocms/pkg/archive"
 	"gocms/pkg/page"
 	"gocms/pkg/request"
 	"gocms/pkg/user"
@@ -23,7 +24,6 @@ func ReplaceTokens(r request.Info, html string, p page.Info) string {
 	html = strings.ReplaceAll(html, `#HOST#`, baseURL)
 	html = strings.ReplaceAll(html, `#HOME#`, getHref(page.GetPages(0, page.Published)[0], p.Route, baseURL))
 	html = strings.ReplaceAll(html, `#BREADCRUMB#`, GetBreadcrumbLinks(r.Domain, p, baseURL))
-	html = strings.ReplaceAll(html, `#TITLE#`, p.Title)
 	html = strings.ReplaceAll(html, `#TOPMENU#`, strings.Join(getPageLinks(p, baseURL, 2), "\n"))
 	html = strings.ReplaceAll(html, `#CONTENT#`, p.Content)
 	html = strings.ReplaceAll(html, `#FOOTERMENU#`, p.Title)
@@ -33,6 +33,7 @@ func ReplaceTokens(r request.Info, html string, p page.Info) string {
 	html = strings.ReplaceAll(html, `#ARCHIVE#`, "Generate archive content")
 	html = strings.ReplaceAll(html, `#RECENT#`, "Generate recent posts content")
 	html = strings.ReplaceAll(html, `#CATEGORIES#`, strings.Join(getCategoryLinks(p, baseURL, 2), "\n"))
+	html = strings.ReplaceAll(html, `#TITLE#`, p.Title)
 	return html
 }
 
@@ -46,12 +47,42 @@ func getScripts() string {
 	return strings.Join(html, "\n")
 }
 
-func getArchiveLinks(parts []string, baseURL string) string {
-	// Change page title
-	// if len(parts) == 0 Get all
-	// if len(parts) == 1 Get year
-	// if len(parts) == 2 Get month
-	return ""
+func generateArchive(r request.Info, p page.Info, baseURL string) string {
+	// The outer HTML will likely be UL tags in the template since a css class may be applied to it
+	links := []string{}
+	switch len(r.SubRoutes) {
+	case 0:
+		for year, count := range archive.GetYears() {
+			links = append(links, fmt.Sprintf(`<li>%d (%d)</li>`, year, count))
+			links = append(links, getMonthArchiveLinks(year, baseURL)...)
+		}
+	}
+	return strings.Join(links, "\n")
+}
+
+func getMonthArchiveLinks(year int, baseURL string) []string {
+	links := []string{}
+	for month, count := range archive.GetMonths(year) {
+		links = append(links, fmt.Sprintf(`<li>%s (%d)</li>`, month, count))
+		links = append(links, getDayArchiveLinks(year, month, baseURL)...)
+	}
+	return links
+}
+
+func getDayArchiveLinks(year int, month time.Month, baseURL string) []string {
+	links := []string{}
+	for day, posts := range archive.GetDays(year, month) {
+		for _, p := range posts {
+			links = append(links, fmt.Sprintf(`<li>%d %s</li>`, day, p.Title))
+			links = append(links, fmt.Sprintf("<li>%s</li>\n", getHref(p, "-", baseURL)))
+		}
+	}
+	return links
+}
+
+func getPostLinks(posts []page.Info) []string {
+	links := []string{}
+	return links
 }
 
 func getPageLinks(p page.Info, baseURL string, depth int) []string {
