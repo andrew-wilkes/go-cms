@@ -3,14 +3,15 @@ package content
 import (
 	"fmt"
 	"gocms/pkg/page"
+	"gocms/pkg/request"
 	"gocms/pkg/user"
 	"strings"
 	"time"
 )
 
 // ReplaceTokens in HTML
-func ReplaceTokens(scheme string, domain string, html string, p page.Info) string {
-	baseURL := fmt.Sprintf("%s://%s", scheme, domain)
+func ReplaceTokens(r request.Info, html string, p page.Info) string {
+	baseURL := fmt.Sprintf("%s://%s", r.Scheme, r.Domain)
 	year, month, day := time.Now().Date()
 	if user.GetStatus().LoggedIn {
 		html = strings.Replace(html, `#CSS#`, `<link rel="stylesheet" href="#HOST#/css/content-tools.min.css">`, 1)
@@ -21,7 +22,7 @@ func ReplaceTokens(scheme string, domain string, html string, p page.Info) strin
 	}
 	html = strings.ReplaceAll(html, `#HOST#`, baseURL)
 	html = strings.ReplaceAll(html, `#HOME#`, getHref(page.GetPages(0, page.Published)[0], p.Route, baseURL))
-	html = strings.ReplaceAll(html, `#BREADCRUMB#`, GetBreadcrumbLinks(domain, p, baseURL))
+	html = strings.ReplaceAll(html, `#BREADCRUMB#`, GetBreadcrumbLinks(r.Domain, p, baseURL))
 	html = strings.ReplaceAll(html, `#TITLE#`, p.Title)
 	html = strings.ReplaceAll(html, `#TOPMENU#`, strings.Join(getPageLinks(p, baseURL, 2), "\n"))
 	html = strings.ReplaceAll(html, `#CONTENT#`, p.Content)

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"gocms/pkg/files"
+	"gocms/pkg/request"
 	"gocms/pkg/router"
 	"os"
 	"path/filepath"
@@ -64,7 +65,7 @@ func ProcessInput(jsonData string) ([]string, string) {
 }
 
 // ParseURI splits the uri into component parts
-func ParseURI(uri string) router.Request {
+func ParseURI(uri string) request.Info {
 	var r = router.Request{GetArgs: make(map[string]string)}
 	p := strings.Split(uri, "?")
 	r.Route = p[0]

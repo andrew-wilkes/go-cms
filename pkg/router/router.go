@@ -3,28 +3,17 @@ package router
 // This package builds the web page content according to the provided route and other request data
 
 import (
-	"encoding/json"
 	"gocms/pkg/content"
 	"gocms/pkg/files"
 	"gocms/pkg/page"
+	"gocms/pkg/request"
 	"io/ioutil"
 	"regexp"
 	"strings"
 )
 
-// Request type
-type Request struct {
-	Domain    string
-	Route     string
-	SubRoutes []string
-	Method    string
-	Scheme    string
-	GetArgs   map[string]string
-	PostData  map[string]json.RawMessage
-}
-
 // Process a request
-func Process(r Request) ([]string, string) {
+func Process(r request.Info) ([]string, string) {
 	r = ExtractSubRoutes(r)
 	headers := []string{}
 	html := ""
@@ -34,13 +23,13 @@ func Process(r Request) ([]string, string) {
 		html = "Page not found at: " + r.Route
 	} else {
 		template := GetTemplate(r.Domain, page.Template)
-		html = content.ReplaceTokens(r.Scheme, r.Domain, template, page)
+		html = content.ReplaceTokens(r, template, page)
 	}
 	return headers, html
 }
 
 // ExtractSubRoutes scans the route for special prefixes and uses the rest of the route to extract the subroutes
-func ExtractSubRoutes(r Request) Request {
+func ExtractSubRoutes(r request.Info) request.Info {
 	stems := []string{"/archive"}
 	for _, stem := range stems {
 		if strings.HasPrefix(r.Route, stem) {
