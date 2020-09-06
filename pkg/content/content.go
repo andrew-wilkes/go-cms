@@ -31,7 +31,7 @@ func ReplaceTokens(r request.Info, html string, p page.Info) string {
 	html = strings.ReplaceAll(html, `#MONTH#`, fmt.Sprint(month))
 	html = strings.ReplaceAll(html, `#YEAR#`, fmt.Sprint(year))
 	html = strings.ReplaceAll(html, `#ARCHIVE#`, generateArchive(r, baseURL))
-	html = strings.ReplaceAll(html, `#RECENT#`, "Generate recent posts content")
+	html = strings.ReplaceAll(html, `#RECENT#`, addRecentPostsLinks(html, baseURL))
 	html = strings.ReplaceAll(html, `#PAGESINCATEGORY#`, getPagesInCategory(p, baseURL))
 	html = strings.ReplaceAll(html, `#TITLE#`, p.Title)
 	html = addMenus(html, baseURL)
@@ -78,7 +78,7 @@ func addCategoryLinks(html string, baseURL string, currentPage page.Info) string
 }
 
 func addRecentPostsLinks(html string, baseURL string) string {
-	re, _ := regexp.Compile(`#RECENT_(\d+)#`) // e.g. #RECENT_2# to get a list that is 2 levels deep
+	re, _ := regexp.Compile(`#RECENT_(\d+)#`) // e.g. #RECENT_10# to get a list of 10 posts
 	m := re.FindAllStringSubmatch(html, -1)
 	if m != nil {
 		for _, token := range m {
