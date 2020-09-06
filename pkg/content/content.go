@@ -78,7 +78,7 @@ func addCategoryLinks(html string, baseURL string, currentPage page.Info) string
 }
 
 func addRecentPostsLinks(html string, baseURL string) string {
-	re, _ := regexp.Compile(`#RECENT_(\d)#`) // e.g. #RECENT_2# to get a list that is 2 levels deep
+	re, _ := regexp.Compile(`#RECENT_(\d+)#`) // e.g. #RECENT_2# to get a list that is 2 levels deep
 	m := re.FindAllStringSubmatch(html, -1)
 	if m != nil {
 		for _, token := range m {

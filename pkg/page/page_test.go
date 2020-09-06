@@ -175,7 +175,7 @@ func addPage(title string, route string, id int, parent int, template string, ca
 func TestGetRecentPosts(t *testing.T) {
 	files.Root = "../files/"
 	LoadData("test")
-	want := 4
+	want := 10
 	posts := GetRecentPosts(want)
 	got := len(posts)
 	if got != want {
