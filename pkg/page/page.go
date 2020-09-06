@@ -11,37 +11,28 @@ import (
 // Status type
 type Status int
 
-// Type type
-type Type int
-
 // Draft or Published status constants
 const (
 	Draft Status = iota
 	Published
 )
 
-// Post or Page type constants
-const (
-	Page Type = iota
-	Post
-)
-
 // Info type
 type Info struct {
-	ID          int
-	Parent      int
-	Depth       int
-	Title       string
-	Description string
-	Content     string
-	Route       string
-	Author      string
-	Status      Status
-	Category    int
-	Menu        string
-	Template    string
-	PubDate     time.Time
-	UpdateDate  time.Time
+	ID          int       // This is a reference number for the page data
+	Parent      int       // The ID of this page's parent in the tree
+	Depth       int       // The indentation level for this page in the Dashboard tree
+	Title       string    // As used in the HTML title tag and link text
+	Description string    // As used in the HTML description tag and link title text (optional)
+	Content     string    // Used to store the HTML content for the page when it needs to be passed around in the Dashboard
+	Route       string    // The virtual URI route to match with the webpage being requested
+	Author      string    // Maybe useful for displaying the author of the content
+	Status      Status    // A flag for the published or draft status of the page
+	Category    int       // Each page may be associated with one category (do we need tags as well?)
+	Menus       []string  // The lower-case names of menus that this page is associated with such as: side, top, footer
+	Template    string    // Base name of the template file to use such as "page" for the page.html template
+	PubDate     time.Time // Time when the page was first saved
+	UpdateDate  time.Time // Time of the latest re-save
 }
 
 // GetByID by ID a page or post
@@ -162,8 +153,14 @@ func GetPagesInCategory(id int) []Info {
 func GetPagesInMenu(menu string) []Info {
 	list := []Info{}
 	for _, p := range pages {
-		if p.Menu == menu && p.Status == Published {
-			list = append(list, p)
+		if p.Status == Published {
+			for _, m := range p.Menus {
+				if menu == m {
+					list = append(list, p)
+					break
+				}
+			}
+
 		}
 	}
 	return list

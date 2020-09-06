@@ -143,8 +143,10 @@ func TestGetPages(t *testing.T) {
 	files.Root = "../files/"
 	LoadData("test")
 	list := GetPages(0, Published)
-	if len(list) != 4 {
-		t.Errorf("Got length of %v want 4", len(list))
+	got := len(list)
+	want := 9
+	if got != want {
+		t.Errorf("Got length of %d want %d", got, want)
 	}
 }
 
@@ -153,7 +155,7 @@ func addPage(title string, route string, id int, parent int, template string, ca
 	if route == "0" {
 		route = ""
 	}
-	menu := ""
+	menu := "-"
 	if id < 5 {
 		menu = "side"
 	}
@@ -166,7 +168,7 @@ func addPage(title string, route string, id int, parent int, template string, ca
 		Route:    "/" + route,
 		Status:   Published,
 		Category: category,
-		Menu:     menu,
+		Menus:    []string{menu},
 		PubDate:  pubDate,
 	})
 	SaveContent("test", id, title)

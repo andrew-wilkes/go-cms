@@ -18,7 +18,7 @@ func TestReplaceTokens(t *testing.T) {
 	content := ReplaceTokens(request.Info{Scheme: "http", Domain: "test"}, html, page)
 	println(content)
 	got := fmt.Sprintf("%x", md5.Sum([]byte(content)))
-	want := "ccabdae6e8a3dce76ac249c82bb0ed26"
+	want := "90b74676249768fa7b9e78f1c444cecc"
 	if got != want {
 		t.Errorf("Want %s got %s", want, got)
 	}
@@ -96,19 +96,19 @@ func TestGenerateArchive(t *testing.T) {
 	r := request.Info{}
 	baseURL := "test.com"
 	got := len(generateArchive(r, baseURL))
-	want := 6882
+	want := 7723
 	if got != want {
 		t.Errorf("Want %d got %d", want, got)
 	}
 	r.SubRoutes = append(r.SubRoutes, "2015")
 	got = len(generateArchive(r, baseURL))
-	want = 1682
+	want = 1892
 	if got != want {
 		t.Errorf("Want %d got %d", want, got)
 	}
 	r.SubRoutes = append(r.SubRoutes, "01")
 	got = len(generateArchive(r, baseURL))
-	want = 65
+	want = 75
 	if got != want {
 		t.Errorf("Want %d got %d", want, got)
 	}
