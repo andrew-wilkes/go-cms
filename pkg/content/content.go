@@ -6,12 +6,13 @@ import (
 	"gocms/pkg/page"
 	"gocms/pkg/request"
 	"gocms/pkg/user"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
 )
 
-// ReplaceTokens in HTML
+// ReplaceTokens in HTML template
 func ReplaceTokens(r request.Info, html string, p page.Info) string {
 	baseURL := fmt.Sprintf("%s://%s", r.Scheme, r.Domain)
 	year, month, day := time.Now().Date()
@@ -25,17 +26,53 @@ func ReplaceTokens(r request.Info, html string, p page.Info) string {
 	html = strings.ReplaceAll(html, `#HOST#`, baseURL)
 	html = strings.ReplaceAll(html, `#HOME#`, getHref(page.GetPages(0, page.Published)[0], p.Route, baseURL))
 	html = strings.ReplaceAll(html, `#BREADCRUMB#`, GetBreadcrumbLinks(r.Domain, p, baseURL))
-	html = strings.ReplaceAll(html, `#TOPMENU#`, strings.Join(getPageLinks(p, baseURL, 2), "\n"))
 	html = strings.ReplaceAll(html, `#CONTENT#`, p.Content)
-	html = strings.ReplaceAll(html, `#FOOTERMENU#`, p.Title)
 	html = strings.ReplaceAll(html, `#DAY#`, fmt.Sprint(day))
 	html = strings.ReplaceAll(html, `#MONTH#`, fmt.Sprint(month))
 	html = strings.ReplaceAll(html, `#YEAR#`, fmt.Sprint(year))
 	html = strings.ReplaceAll(html, `#ARCHIVE#`, generateArchive(r, baseURL))
 	html = strings.ReplaceAll(html, `#RECENT#`, "Generate recent posts content")
-	html = strings.ReplaceAll(html, `#CATEGORIES#`, strings.Join(getCategoryLinks(p, baseURL, 2), "\n"))
 	html = strings.ReplaceAll(html, `#PAGESINCATEGORY#`, getPagesInCategory(p, baseURL))
 	html = strings.ReplaceAll(html, `#TITLE#`, p.Title)
+	html = addMenus(html, baseURL)
+	html = addPageLinks(html, baseURL, p)
+	html = addCategoryLinks(html, baseURL, p)
+	return html
+}
+
+func addMenus(html string, baseURL string) string {
+	re, _ := regexp.Compile(`#(\w+)_MENU#`) // e.g. SIDE_MENU
+	m := re.FindAllStringSubmatch(html, -1)
+	if m != nil {
+		for _, token := range m {
+			menu := makeHTMLList(page.GetPagesInMenu(strings.ToLower(token[1])), baseURL)
+			html = strings.ReplaceAll(html, token[0], menu)
+		}
+	}
+	return html
+}
+
+func addPageLinks(html string, baseURL string, currentPage page.Info) string {
+	re, _ := regexp.Compile(`#PAGES_(\d)#`) // e.g. #PAGES_2# to get a list that is 2 levels deep
+	m := re.FindAllStringSubmatch(html, -1)
+	if m != nil {
+		for _, token := range m {
+			list := strings.Join(getPageLinks(currentPage, baseURL, getInt(token[1])), "\n")
+			html = strings.ReplaceAll(html, token[0], list)
+		}
+	}
+	return html
+}
+
+func addCategoryLinks(html string, baseURL string, currentPage page.Info) string {
+	re, _ := regexp.Compile(`#CATEGORIES_(\d)#`) // e.g. #CATEGORIES_2# to get a list that is 2 levels deep
+	m := re.FindAllStringSubmatch(html, -1)
+	if m != nil {
+		for _, token := range m {
+			list := strings.Join(getCategoryLinks(currentPage, baseURL, getInt(token[1])), "\n")
+			html = strings.ReplaceAll(html, token[0], list)
+		}
+	}
 	return html
 }
 
@@ -145,11 +182,14 @@ func getCategoryLinks(p page.Info, base string, depth int) []string {
 	return links
 }
 
-func getPagesInCategory(p page.Info, base string) string {
+func getPagesInCategory(p page.Info, baseURL string) string {
+	return makeHTMLList(page.GetPagesInCategory(p.ID), baseURL)
+}
+
+func makeHTMLList(pages []page.Info, baseURL string) string {
 	links := []string{}
-	pages := page.GetPagesInCategory(p.ID)
 	for _, item := range pages {
-		links = append(links, fmt.Sprintf("<li>%s</li>\n", getHref(item, "-", base)))
+		links = append(links, fmt.Sprintf("<li>%s</li>\n", getHref(item, "-", baseURL)))
 	}
 	return strings.Join(links, "\n")
 }

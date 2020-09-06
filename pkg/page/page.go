@@ -38,7 +38,7 @@ type Info struct {
 	Author      string
 	Status      Status
 	Category    int
-	Type        Type
+	Menu        string
 	Template    string
 	PubDate     time.Time
 	UpdateDate  time.Time
@@ -152,6 +152,17 @@ func GetPagesInCategory(id int) []Info {
 	list := []Info{}
 	for _, p := range pages {
 		if p.Category == id && p.Status == Published && p.Template != "category" {
+			list = append(list, p)
+		}
+	}
+	return list
+}
+
+// GetPagesInMenu returns a slice of pages and posts in a menu
+func GetPagesInMenu(menu string) []Info {
+	list := []Info{}
+	for _, p := range pages {
+		if p.Menu == menu && p.Status == Published {
 			list = append(list, p)
 		}
 	}

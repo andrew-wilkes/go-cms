@@ -124,3 +124,33 @@ func TestGetPagesInCategory(t *testing.T) {
 		t.Errorf("Want %d got %d", want, got)
 	}
 }
+
+func TestAddMenus(t *testing.T) {
+	files.Root = "../files/"
+	page.LoadData("test")
+	got := addMenus("aaa #SIDE_MENU# bbb", "test.com")
+	want := "aaa <li><a"
+	if !strings.HasPrefix(got, want) {
+		t.Errorf("Want %s got %s", want, got)
+	}
+}
+
+func TestAddPageLinks(t *testing.T) {
+	files.Root = "../files/"
+	page.LoadData("test")
+	got := addPageLinks("aaa #PAGES_1# bbb", "test.com", page.Info{})
+	want := "aaa <li><a"
+	if !strings.HasPrefix(got, want) {
+		t.Errorf("Want %s got %s", want, got)
+	}
+}
+
+func TestAddCategoryLinks(t *testing.T) {
+	files.Root = "../files/"
+	page.LoadData("test")
+	got := addCategoryLinks("aaa #CATEGORIES_1# bbb", "test.com", page.Info{ID: 999})
+	want := "aaa <li><a"
+	if !strings.HasPrefix(got, want) {
+		t.Errorf("Want %s got %s", want, got)
+	}
+}

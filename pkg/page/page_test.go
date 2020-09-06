@@ -153,6 +153,10 @@ func addPage(title string, route string, id int, parent int, template string, ca
 	if route == "0" {
 		route = ""
 	}
+	menu := ""
+	if id < 5 {
+		menu = "side"
+	}
 	Add(Info{
 		ID:       id,
 		Parent:   parent,
@@ -162,6 +166,7 @@ func addPage(title string, route string, id int, parent int, template string, ca
 		Route:    "/" + route,
 		Status:   Published,
 		Category: category,
+		Menu:     menu,
 		PubDate:  pubDate,
 	})
 	SaveContent("test", id, title)
