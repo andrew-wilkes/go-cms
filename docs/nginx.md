@@ -40,3 +40,33 @@ Here is an example of how to set up a server block in the **nginx.conf** file or
                 include        fastcgi.conf;
             }
         }
+
+In this example our domain name is: **gocms. com**
+
+Link: https://docs.nginx.com/nginx/admin-guide/installing-nginx/installing-nginx-open-source/
+
+## Server Admin Notes
+
+ Start Nginx Service
+
+    sudo systemctl start nginx
+
+Stop Nginx Service
+
+    sudo systemctl stop nginx
+
+Enable Nginx on boot
+
+    sudo systemctl enable nginx
+
+Get 502 Bad Gateway if php-fpm is not running.
+
+    sudo systemctl start php-fpm
+    sudo systemctl stop php-fpm
+
+### PHP-fpm Settings
+
+In */etc/php/php-fpm.d/www.conf* set:
+
+    user = http
+    group = www-data
