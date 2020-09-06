@@ -6,6 +6,7 @@ import (
 	"gocms/pkg/page"
 	"gocms/pkg/request"
 	"gocms/pkg/user"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -47,34 +48,52 @@ func getScripts() string {
 	return strings.Join(html, "\n")
 }
 
-func generateArchive(r request.Info, p page.Info, baseURL string) string {
+func generateArchive(r request.Info, baseURL string) string {
 	// The outer HTML will likely be UL tags in the template since a css class may be applied to it
-	links := []string{}
+	var links []string
 	switch len(r.SubRoutes) {
 	case 0:
-		for year, count := range archive.GetYears() {
-			links = append(links, fmt.Sprintf(`<li>%d (%d)</li>`, year, count))
-			links = append(links, getMonthArchiveLinks(year, baseURL)...)
-		}
+		links = getYearArchiveLinks(baseURL)
+	case 1:
+		links = getMonthArchiveLinks(getInt(r.SubRoutes[0]), baseURL)
+	case 2:
+		links = getDayArchiveLinks(getInt(r.SubRoutes[0]), time.Month(getInt(r.SubRoutes[1])), baseURL)
 	}
 	return strings.Join(links, "\n")
+}
+
+func getInt(str string) int {
+	i, _ := strconv.Atoi(str)
+	return i // Return 0 if there is an error
+}
+
+func getYearArchiveLinks(baseURL string) []string {
+	links := []string{}
+	for year, count := range archive.GetYears() {
+		links = append(links, fmt.Sprintf(`<li>%d (%d)</li>`, year, count))
+		links = append(links, "<ul>")
+		links = append(links, getMonthArchiveLinks(year, baseURL)...)
+		links = append(links, "</ul>")
+	}
+	return links
 }
 
 func getMonthArchiveLinks(year int, baseURL string) []string {
 	links := []string{}
 	for month, count := range archive.GetMonths(year) {
 		links = append(links, fmt.Sprintf(`<li>%s (%d)</li>`, month, count))
+		links = append(links, "<ul>")
 		links = append(links, getDayArchiveLinks(year, month, baseURL)...)
+		links = append(links, "</ul>")
 	}
 	return links
 }
 
 func getDayArchiveLinks(year int, month time.Month, baseURL string) []string {
 	links := []string{}
-	for day, posts := range archive.GetDays(year, month) {
+	for _, posts := range archive.GetDays(year, month) {
 		for _, p := range posts {
-			links = append(links, fmt.Sprintf(`<li>%d %s</li>`, day, p.Title))
-			links = append(links, fmt.Sprintf("<li>%s</li>\n", getHref(p, "-", baseURL)))
+			links = append(links, fmt.Sprintf("<li>%s %s</li>", p.PubDate.Format("2006-01-02 15:04 Monday"), getHref(p, "-", baseURL)))
 		}
 	}
 	return links

@@ -99,11 +99,11 @@ func TestGeneratePosts(t *testing.T) {
 		for b := 0; b < 4; b++ {
 			id++
 			bid := id
-			addPage("Page ", fmt.Sprintf("%d-%d", a, b), bid, aid, "post", 0, getTime(2000+a*5, time.Month(2+b), 1))
+			addPage("Post ", fmt.Sprintf("%d-%d", a, b), bid, aid, "post", 0, getTime(2000+a*5, time.Month(2+b), 1))
 			for c := 0; c < 4; c++ {
 				id++
 				cid := id
-				addPage("Page ", fmt.Sprintf("%d-%d-%d", a, b, c), cid, bid, "post", 0, getTime(2000+a*5, time.Month(2+b), 1+c*2))
+				addPage("Post ", fmt.Sprintf("%d-%d-%d", a, b, c), cid, bid, "post", 0, getTime(2000+a*5, time.Month(2+b), 1+c*2))
 			}
 		}
 	}
