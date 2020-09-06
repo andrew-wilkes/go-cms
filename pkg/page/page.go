@@ -124,7 +124,7 @@ func Save(domain string, info Info, saveContent bool) int {
 func GetPages(parent int, status Status) []Info {
 	list := []Info{}
 	for _, p := range pages {
-		if p.Parent == parent && p.Status == status && p.Template == "post" || p.Template == "page" {
+		if p.Parent == parent && p.Status == status {
 			list = append(list, p)
 		}
 	}
@@ -141,6 +141,17 @@ func GetCategoryPages(id int, status Status) []Info {
 	list := []Info{}
 	for _, p := range pages {
 		if p.Category == id && p.Status == status && p.Template == "category" {
+			list = append(list, p)
+		}
+	}
+	return list
+}
+
+// GetPagesInCategory returns a slice of pages and posts in a category
+func GetPagesInCategory(id int) []Info {
+	list := []Info{}
+	for _, p := range pages {
+		if p.Category == id && p.Status == Published && p.Template != "category" {
 			list = append(list, p)
 		}
 	}

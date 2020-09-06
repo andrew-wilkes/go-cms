@@ -16,6 +16,7 @@ func TestReplaceTokens(t *testing.T) {
 	html := "#TITLE# #TOPMENU# #CONTENT# #FOOTERMENU# #DATE# #SCRIPTS#"
 	page := page.Info{Title: "Test", Content: "Content"}
 	content := ReplaceTokens(request.Info{Scheme: "http", Domain: "test"}, html, page)
+	println(content)
 	got := fmt.Sprintf("%x", md5.Sum([]byte(content)))
 	want := "ccabdae6e8a3dce76ac249c82bb0ed26"
 	if got != want {
@@ -108,6 +109,17 @@ func TestGenerateArchive(t *testing.T) {
 	r.SubRoutes = append(r.SubRoutes, "01")
 	got = len(generateArchive(r, baseURL))
 	want = 65
+	if got != want {
+		t.Errorf("Want %d got %d", want, got)
+	}
+}
+
+func TestGetPagesInCategory(t *testing.T) {
+	files.Root = "../files/"
+	page.LoadData("test")
+	pages := getPagesInCategory(page.Info{ID: 1}, "test.com")
+	got := len(pages)
+	want := 3199
 	if got != want {
 		t.Errorf("Want %d got %d", want, got)
 	}

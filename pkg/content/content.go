@@ -31,9 +31,10 @@ func ReplaceTokens(r request.Info, html string, p page.Info) string {
 	html = strings.ReplaceAll(html, `#DAY#`, fmt.Sprint(day))
 	html = strings.ReplaceAll(html, `#MONTH#`, fmt.Sprint(month))
 	html = strings.ReplaceAll(html, `#YEAR#`, fmt.Sprint(year))
-	html = strings.ReplaceAll(html, `#ARCHIVE#`, "Generate archive content")
+	html = strings.ReplaceAll(html, `#ARCHIVE#`, generateArchive(r, baseURL))
 	html = strings.ReplaceAll(html, `#RECENT#`, "Generate recent posts content")
 	html = strings.ReplaceAll(html, `#CATEGORIES#`, strings.Join(getCategoryLinks(p, baseURL, 2), "\n"))
+	html = strings.ReplaceAll(html, `#PAGESINCATEGORY#`, getPagesInCategory(p, baseURL))
 	html = strings.ReplaceAll(html, `#TITLE#`, p.Title)
 	return html
 }
@@ -142,6 +143,15 @@ func getCategoryLinks(p page.Info, base string, depth int) []string {
 		}
 	}
 	return links
+}
+
+func getPagesInCategory(p page.Info, base string) string {
+	links := []string{}
+	pages := page.GetPagesInCategory(p.ID)
+	for _, item := range pages {
+		links = append(links, fmt.Sprintf("<li>%s</li>\n", getHref(item, "-", base)))
+	}
+	return strings.Join(links, "\n")
 }
 
 func getHref(p page.Info, route string, baseURL string) string {

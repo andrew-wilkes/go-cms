@@ -81,7 +81,7 @@ func TestGeneratePages(t *testing.T) {
 			for c := 0; c < 4; c++ {
 				id++
 				cid := id
-				addPage("Page ", fmt.Sprintf("%d-%d-%d", a, b, c), cid, bid, "past", 0, pubDate)
+				addPage("Page ", fmt.Sprintf("%d-%d-%d", a, b, c), cid, bid, "past", 1, pubDate)
 			}
 		}
 	}
@@ -95,15 +95,15 @@ func TestGeneratePosts(t *testing.T) {
 	for a := 0; a < 4; a++ {
 		id++
 		aid := id
-		addPage("Post ", fmt.Sprintf("%d", a), aid, 0, "post", 0, getTime(2000+a*5, time.January, a*2))
+		addPage("Post ", fmt.Sprintf("blog/%d", a), aid, 0, "post", 0, getTime(2000+a*5, time.January, a*2))
 		for b := 0; b < 4; b++ {
 			id++
 			bid := id
-			addPage("Post ", fmt.Sprintf("%d-%d", a, b), bid, aid, "post", 0, getTime(2000+a*5, time.Month(2+b), 1))
+			addPage("Post ", fmt.Sprintf("blog/%d-%d", a, b), bid, aid, "post", 0, getTime(2000+a*5, time.Month(2+b), 1))
 			for c := 0; c < 4; c++ {
 				id++
 				cid := id
-				addPage("Post ", fmt.Sprintf("%d-%d-%d", a, b, c), cid, bid, "post", 0, getTime(2000+a*5, time.Month(2+b), 1+c*2))
+				addPage("Post ", fmt.Sprintf("blog/%d-%d-%d", a, b, c), cid, bid, "post", 0, getTime(2000+a*5, time.Month(2+b), 1+c*2))
 			}
 		}
 	}
