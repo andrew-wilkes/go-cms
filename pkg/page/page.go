@@ -176,12 +176,12 @@ func Add(newPage Info) {
 
 // GetRecentPosts returns a slice of the posts with highest index value
 func GetRecentPosts(n int) []Info {
-	var posts []Info
+	var posts = make([]Info, n)
 	count := 0
 	for i := len(pages) - 1; i >= 0; i-- {
 		p := pages[i]
 		if p.Status == Published && p.Template == "post" {
-			posts = append(posts, p)
+			posts[count] = p
 			count++
 			if count == n {
 				break
