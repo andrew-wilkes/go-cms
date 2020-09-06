@@ -173,3 +173,20 @@ func GetPagesInMenu(menu string) []Info {
 func Add(newPage Info) {
 	pages = append(pages, newPage)
 }
+
+// GetRecentPosts returns a slice of the posts with highest index value
+func GetRecentPosts(n int) []Info {
+	var posts []Info
+	count := 0
+	for i := len(pages) - 1; i >= 0; i-- {
+		p := pages[i]
+		if p.Status == Published && p.Template == "post" {
+			posts = append(posts, p)
+			count++
+			if count == n {
+				break
+			}
+		}
+	}
+	return posts
+}

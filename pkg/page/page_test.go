@@ -171,3 +171,14 @@ func addPage(title string, route string, id int, parent int, template string, ca
 	})
 	SaveContent("test", id, title)
 }
+
+func TestGetRecentPosts(t *testing.T) {
+	files.Root = "../files/"
+	LoadData("test")
+	want := 4
+	posts := GetRecentPosts(want)
+	got := len(posts)
+	if got != want {
+		t.Errorf("Want %d got %d", want, got)
+	}
+}

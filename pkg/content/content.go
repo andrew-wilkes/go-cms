@@ -37,6 +37,7 @@ func ReplaceTokens(r request.Info, html string, p page.Info) string {
 	html = addMenus(html, baseURL)
 	html = addPageLinks(html, baseURL, p)
 	html = addCategoryLinks(html, baseURL, p)
+	html = addRecentPostsLinks(html, baseURL)
 	return html
 }
 
@@ -70,6 +71,18 @@ func addCategoryLinks(html string, baseURL string, currentPage page.Info) string
 	if m != nil {
 		for _, token := range m {
 			list := strings.Join(getCategoryLinks(currentPage, baseURL, getInt(token[1])), "\n")
+			html = strings.ReplaceAll(html, token[0], list)
+		}
+	}
+	return html
+}
+
+func addRecentPostsLinks(html string, baseURL string) string {
+	re, _ := regexp.Compile(`#RECENT_(\d)#`) // e.g. #RECENT_2# to get a list that is 2 levels deep
+	m := re.FindAllStringSubmatch(html, -1)
+	if m != nil {
+		for _, token := range m {
+			list := makeHTMLList(page.GetRecentPosts(getInt(token[1])), baseURL)
 			html = strings.ReplaceAll(html, token[0], list)
 		}
 	}

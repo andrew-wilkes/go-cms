@@ -154,3 +154,13 @@ func TestAddCategoryLinks(t *testing.T) {
 		t.Errorf("Want %s got %s", want, got)
 	}
 }
+
+func TestAddRecentPostsLinks(t *testing.T) {
+	files.Root = "../files/"
+	page.LoadData("test")
+	got := addRecentPostsLinks("aaa #RECENT_4# bbb", "test.com")
+	want := "aaa <li><a"
+	if !strings.HasPrefix(got, want) {
+		t.Errorf("Want %s got %s", want, got)
+	}
+}
