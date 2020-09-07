@@ -117,9 +117,9 @@ func TestGenerateArchive(t *testing.T) {
 func TestGetPagesInCategory(t *testing.T) {
 	files.Root = "../files/"
 	page.LoadData("test")
-	pages := getPagesInCategory(page.Info{ID: 1}, "test.com")
+	pages := getPagesInCategory(page.Info{ID: 601}, "test.com")
 	got := len(pages)
-	want := 3199
+	want := 166
 	if got != want {
 		t.Errorf("Want %d got %d", want, got)
 	}

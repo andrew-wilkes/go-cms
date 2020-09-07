@@ -66,7 +66,7 @@ func ProcessInput(jsonData string) ([]string, string) {
 
 // ParseURI splits the uri into component parts
 func ParseURI(uri string) request.Info {
-	var r = router.Request{GetArgs: make(map[string]string)}
+	var r = request.Info{GetArgs: make(map[string]string)}
 	p := strings.Split(uri, "?")
 	r.Route = p[0]
 	if len(p) > 1 {

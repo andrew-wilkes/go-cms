@@ -73,15 +73,15 @@ func TestGeneratePages(t *testing.T) {
 	for a := 0; a < 4; a++ {
 		id++
 		aid := id
-		addPage("Page ", fmt.Sprintf("%d", a), aid, 0, "home", 0, pubDate)
+		addPage("Page ", fmt.Sprintf("%d", a), aid, 0, "home", 601, pubDate)
 		for b := 0; b < 4; b++ {
 			id++
 			bid := id
-			addPage("Page ", fmt.Sprintf("%d-%d", a, b), bid, aid, "page", 0, pubDate)
+			addPage("Page ", fmt.Sprintf("%d-%d", a, b), bid, aid, "page", 602, pubDate)
 			for c := 0; c < 4; c++ {
 				id++
 				cid := id
-				addPage("Page ", fmt.Sprintf("%d-%d-%d", a, b, c), cid, bid, "past", 1, pubDate)
+				addPage("Page ", fmt.Sprintf("%d-%d-%d", a, b, c), cid, bid, "past", 603, pubDate)
 			}
 		}
 	}
@@ -120,11 +120,11 @@ func TestGenerateCategoryPages(t *testing.T) {
 	pubDate := time.Now()
 	// Set the root category page
 	id := 600
-	addPage("Categories ", "cats", id, 0, "category", 0, pubDate)
+	addPage("Top-most Categories ", "cats", id, 0, "category", 0, pubDate)
 	for a := 0; a < 4; a++ {
 		id++
 		aid := id
-		addPage("Category ", fmt.Sprintf("cat-%d", aid), aid, 999, "category", 999, pubDate)
+		addPage("Category ", fmt.Sprintf("cat-%d", aid), aid, 600, "category", 600, pubDate)
 		for b := 0; b < 4; b++ {
 			id++
 			bid := id
