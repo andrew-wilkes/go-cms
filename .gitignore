@@ -16,5 +16,3 @@ config.toml
 build/*
 !build/README.md
 *.ods#
-**/test/pages/*
-**/test/data/*
