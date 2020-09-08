@@ -24,6 +24,7 @@ func ReplaceTokens(r request.Info, html string, p page.Info) string {
 		html = strings.Replace(html, `#SCRIPTS#`, "", 1)
 	}
 	html = strings.ReplaceAll(html, `#HOST#`, baseURL)
+	html = strings.ReplaceAll(html, `#ID#`, fmt.Sprintf("%d", p.ID))
 	// The home page is associated with an ID of 1
 	html = strings.ReplaceAll(html, `#HOME#`, getHref(page.GetByID(r.Domain, 1, false), p.Route, baseURL))
 	html = strings.ReplaceAll(html, `#BREADCRUMB#`, GetBreadcrumbLinks(r.Domain, p, baseURL))

@@ -73,7 +73,7 @@ func TestGeneratePages(t *testing.T) {
 	for a := 0; a < 4; a++ {
 		id++
 		aid := id
-		addPage("Page ", fmt.Sprintf("%d", a), aid, 0, "home", 601, pubDate)
+		addPage("Home Page", fmt.Sprintf("%d", a), aid, 0, "home", 601, pubDate)
 		for b := 0; b < 4; b++ {
 			id++
 			bid := id
@@ -153,7 +153,9 @@ func TestGetPages(t *testing.T) {
 }
 
 func addPage(title string, route string, id int, parent int, template string, category int, pubDate time.Time) {
-	title += route
+	if template == "post" || template == "page" {
+		title += route
+	}
 	if route == "0" {
 		route = ""
 	}

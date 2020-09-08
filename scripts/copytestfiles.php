@@ -7,6 +7,7 @@ include_once(__DIR__ . "/config.php");
 
 $server_script_path = $config->get("server_script_path");
 $domain = $config->get("domain");
+$web_root = $config->get("web_root");
 
 $dest = "$server_script_path/$domain";
 
@@ -26,6 +27,21 @@ array_walk($files, 'copy_files', "$dest/templates/");
 
 copy_file($src, $dest, "/data/pages.json");
 
+// Set up web folders
+add_folder("$web_root/css");
+add_folder("$web_root/js");
+
+// Copy new files
+$files =  glob("$src/styles/*.css");
+array_walk($files, 'copy_files', "$web_root/css/");
+$files =  glob("$src/scripts/*.js");
+array_walk($files, 'copy_files', "$web_root/js/");
+
+function add_folder($fn) {
+    if (!file_exists($fn))
+        mkdir($fn);
+}
+
 function copy_file($src, $dest, $jsonPath) {
     $src .= $jsonPath;
     $dest .= $jsonPath;
@@ -38,4 +54,5 @@ function copy_file($src, $dest, $jsonPath) {
 function copy_files($src, $key, $dest) {
     copy($src, $dest . basename($src));
 }
+
 echo "Done\n";
