@@ -24,7 +24,8 @@ func ReplaceTokens(r request.Info, html string, p page.Info) string {
 		html = strings.Replace(html, `#SCRIPTS#`, "", 1)
 	}
 	html = strings.ReplaceAll(html, `#HOST#`, baseURL)
-	html = strings.ReplaceAll(html, `#HOME#`, getHref(page.GetPages(0, page.Published)[0], p.Route, baseURL))
+	// The home page is associated with an ID of 1
+	html = strings.ReplaceAll(html, `#HOME#`, getHref(page.GetByID(r.Domain, 1, false), p.Route, baseURL))
 	html = strings.ReplaceAll(html, `#BREADCRUMB#`, GetBreadcrumbLinks(r.Domain, p, baseURL))
 	html = strings.ReplaceAll(html, `#CONTENT#`, p.Content)
 	html = strings.ReplaceAll(html, `#DAY#`, fmt.Sprint(day))
@@ -34,19 +35,19 @@ func ReplaceTokens(r request.Info, html string, p page.Info) string {
 	html = strings.ReplaceAll(html, `#RECENT#`, addRecentPostsLinks(html, baseURL))
 	html = strings.ReplaceAll(html, `#PAGESINCATEGORY#`, getPagesInCategory(p, baseURL))
 	html = strings.ReplaceAll(html, `#TITLE#`, p.Title)
-	html = addMenus(html, baseURL)
+	html = addMenus(html, baseURL, r.Route)
 	html = addPageLinks(html, baseURL, p)
 	html = addCategoryLinks(html, baseURL, p)
 	html = addRecentPostsLinks(html, baseURL)
 	return html
 }
 
-func addMenus(html string, baseURL string) string {
+func addMenus(html string, baseURL string, route string) string {
 	re, _ := regexp.Compile(`#(\w+)_MENU#`) // e.g. SIDE_MENU
 	m := re.FindAllStringSubmatch(html, -1)
 	if m != nil {
 		for _, token := range m {
-			menu := makeHTMLList(page.GetPagesInMenu(strings.ToLower(token[1])), baseURL)
+			menu := makeHTMLList(page.GetPagesInMenu(strings.ToLower(token[1])), route, baseURL)
 			html = strings.ReplaceAll(html, token[0], menu)
 		}
 	}
@@ -58,7 +59,7 @@ func addPageLinks(html string, baseURL string, currentPage page.Info) string {
 	m := re.FindAllStringSubmatch(html, -1)
 	if m != nil {
 		for _, token := range m {
-			list := strings.Join(getPageLinks(currentPage, baseURL, getInt(token[1])), "\n")
+			list := strings.Join(getPageLinks(currentPage, baseURL, getInt(token[1]), "page"), "\n")
 			html = strings.ReplaceAll(html, token[0], list)
 		}
 	}
@@ -82,7 +83,7 @@ func addRecentPostsLinks(html string, baseURL string) string {
 	m := re.FindAllStringSubmatch(html, -1)
 	if m != nil {
 		for _, token := range m {
-			list := makeHTMLList(page.GetRecentPosts(getInt(token[1])), baseURL)
+			list := makeHTMLList(page.GetRecentPosts(getInt(token[1])), "-", baseURL)
 			html = strings.ReplaceAll(html, token[0], list)
 		}
 	}
@@ -121,7 +122,7 @@ func getInt(str string) int {
 func getYearArchiveLinks(baseURL string) []string {
 	links := []string{}
 	for year, count := range archive.GetYears() {
-		links = append(links, fmt.Sprintf(`<li>%d (%d)</li>`, year, count))
+		links = append(links, fmt.Sprintf(`<li><a href="%s/archive/%d">%d</a> (%d)</li>`, baseURL, year, year, count))
 		links = append(links, "<ul>")
 		links = append(links, getMonthArchiveLinks(year, baseURL)...)
 		links = append(links, "</ul>")
@@ -132,7 +133,7 @@ func getYearArchiveLinks(baseURL string) []string {
 func getMonthArchiveLinks(year int, baseURL string) []string {
 	links := []string{}
 	for month, count := range archive.GetMonths(year) {
-		links = append(links, fmt.Sprintf(`<li>%s (%d)</li>`, month, count))
+		links = append(links, fmt.Sprintf(`<li><a href="%s/archive/%d/%d">%s</a> (%d)</li>`, baseURL, year, int(month), month, count))
 		links = append(links, "<ul>")
 		links = append(links, getDayArchiveLinks(year, month, baseURL)...)
 		links = append(links, "</ul>")
@@ -155,9 +156,13 @@ func getPostLinks(posts []page.Info) []string {
 	return links
 }
 
-func getPageLinks(p page.Info, baseURL string, depth int) []string {
-	// Return links to pages with a common parent
-	pages := page.GetPages(p.Parent, page.Published)
+func getPageLinks(p page.Info, baseURL string, depth int, template string) []string {
+	// Return links to children of home page, else return links to sibling pages
+	id := 1 // ID of home page
+	if p.ID != id {
+		id = p.Parent
+	}
+	pages := page.GetPages(id, page.Published, template)
 	return scanSubPages(pages, baseURL, depth, p.Route)
 }
 
@@ -175,7 +180,7 @@ func scanSubPages(pages []page.Info, baseURL string, depth int, route string) []
 
 func getSubPageLinks(p page.Info, base string, depth int) []string {
 	// Return links to pages with p.ID as parent
-	pages := page.GetPages(p.ID, page.Published)
+	pages := page.GetPages(p.ID, page.Published, p.Template)
 	return scanSubPages(pages, base, depth, "-")
 }
 
@@ -196,13 +201,13 @@ func getCategoryLinks(p page.Info, base string, depth int) []string {
 }
 
 func getPagesInCategory(p page.Info, baseURL string) string {
-	return makeHTMLList(page.GetPagesInCategory(p.ID), baseURL)
+	return makeHTMLList(page.GetPagesInCategory(p.ID), "-", baseURL)
 }
 
-func makeHTMLList(pages []page.Info, baseURL string) string {
+func makeHTMLList(pages []page.Info, route string, baseURL string) string {
 	links := []string{}
 	for _, item := range pages {
-		links = append(links, fmt.Sprintf("<li>%s</li>\n", getHref(item, "-", baseURL)))
+		links = append(links, fmt.Sprintf("<li>%s</li>\n", getHref(item, route, baseURL)))
 	}
 	return strings.Join(links, "\n")
 }

@@ -19,9 +19,14 @@ func TestGetTemplate(t *testing.T) {
 
 func TestExtractSubRoutes(t *testing.T) {
 	r := request.Info{Route: "/archive/a/b"}
-	r = ExtractSubRoutes(r)
+	r, pageRoute := ExtractSubRoutes(r)
 	want := "b"
 	got := r.SubRoutes[1]
+	if got != want {
+		t.Errorf("Got %s want %s", got, want)
+	}
+	got = pageRoute
+	want = "/archive"
 	if got != want {
 		t.Errorf("Got %s want %s", got, want)
 	}

@@ -17,7 +17,7 @@ a img {
 .header, .footer {
     width: 100%;
     background-color: rgb(116, 174, 207);
-    padding: 20px
+    padding: 0
 }      
 .header li, .footer li {
     display: inline;
@@ -37,15 +37,21 @@ a img {
 .footer {
     clear: both;
 }
+.container {
+    padding: 20px;
+}
 </style>
 </head>
 
 <body data-page-id="#PAGEID#">
 
-  <div class="header">
-    <p>Home link: #HOME#</p>
-    <p>Breadcrumb links: #BREADCRUMB#</p>
-    <ul>
-#TOP_MENU#
-		</ul>
-  </div>
+    <div class="header">
+        <div class="container">
+            <h1>#TITLE#</h1>
+            <p>Home link: #HOME#</p>
+            <p>Breadcrumb links: #BREADCRUMB#</p>
+            <ul>
+                #TOP_MENU#
+            </ul>
+        </div>
+    </div>

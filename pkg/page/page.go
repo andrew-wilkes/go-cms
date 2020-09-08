@@ -112,10 +112,10 @@ func Save(domain string, info Info, saveContent bool) int {
 }
 
 // GetPages returns a slice of pages data
-func GetPages(parent int, status Status) []Info {
+func GetPages(parent int, status Status, template string) []Info {
 	list := []Info{}
 	for _, p := range pages {
-		if p.Parent == parent && p.Status == status {
+		if p.Parent == parent && p.Status == status && p.Template == template {
 			list = append(list, p)
 		}
 	}

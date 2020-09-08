@@ -81,10 +81,12 @@ func TestGeneratePages(t *testing.T) {
 			for c := 0; c < 4; c++ {
 				id++
 				cid := id
-				addPage("Page ", fmt.Sprintf("%d-%d-%d", a, b, c), cid, bid, "past", 603, pubDate)
+				addPage("Page ", fmt.Sprintf("%d-%d-%d", a, b, c), cid, bid, "page", 603, pubDate)
 			}
 		}
 	}
+	id++
+	addPage("Archives", "archive", id, 0, "archive", 0, time.Now())
 	SaveData("test")
 }
 
@@ -120,7 +122,7 @@ func TestGenerateCategoryPages(t *testing.T) {
 	pubDate := time.Now()
 	// Set the root category page
 	id := 600
-	addPage("Top-most Categories ", "cats", id, 0, "category", 0, pubDate)
+	addPage("Categories ", "cats", id, 0, "category", 0, pubDate)
 	for a := 0; a < 4; a++ {
 		id++
 		aid := id
@@ -142,9 +144,9 @@ func TestGenerateCategoryPages(t *testing.T) {
 func TestGetPages(t *testing.T) {
 	files.Root = "../files/"
 	LoadData("test")
-	list := GetPages(0, Published)
+	list := GetPages(1, Published, "page")
 	got := len(list)
-	want := 9
+	want := 4
 	if got != want {
 		t.Errorf("Got length of %d want %d", got, want)
 	}
@@ -156,9 +158,13 @@ func addPage(title string, route string, id int, parent int, template string, ca
 		route = ""
 	}
 	menu := "-"
-	if id < 5 {
+	switch id {
+	case 1, 85, 600:
+		menu = "top"
+	case 2, 3, 4, 5:
 		menu = "side"
 	}
+
 	Add(Info{
 		ID:       id,
 		Parent:   parent,

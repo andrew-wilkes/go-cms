@@ -14,10 +14,10 @@ import (
 
 // Process a request
 func Process(r request.Info) ([]string, string) {
-	r = ExtractSubRoutes(r)
+	r, pageRoute := ExtractSubRoutes(r)
 	headers := []string{}
 	html := ""
-	page := page.GetByRoute(r.Domain, r.Route, true)
+	page := page.GetByRoute(r.Domain, pageRoute, true)
 	if page.ID == 0 {
 		headers = append(headers, "HTTP/1.1 404 Not Found")
 		html = "Page not found at: " + r.Route
@@ -29,17 +29,18 @@ func Process(r request.Info) ([]string, string) {
 }
 
 // ExtractSubRoutes scans the route for special prefixes and uses the rest of the route to extract the subroutes
-func ExtractSubRoutes(r request.Info) request.Info {
+func ExtractSubRoutes(r request.Info) (request.Info, string) {
 	stems := []string{"/archive"}
+	pageRoute := r.Route
 	for _, stem := range stems {
 		if strings.HasPrefix(r.Route, stem) {
 			tail := strings.Replace(r.Route, stem, "", 1)
 			r.SubRoutes = strings.Split(tail, "/")[1:]
-			r.Route = stem
+			pageRoute = stem
 			break
 		}
 	}
-	return r
+	return r, pageRoute
 }
 
 // GetTemplate for page (this is a recursive function to allow for nesting of templates)
