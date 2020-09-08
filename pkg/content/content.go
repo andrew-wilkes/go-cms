@@ -27,7 +27,7 @@ func ReplaceTokens(r request.Info, html string, p page.Info) string {
 	html = strings.ReplaceAll(html, `#ID#`, fmt.Sprintf("%d", p.ID))
 	// The home page is associated with an ID of 1
 	html = strings.ReplaceAll(html, `#HOME#`, getHref(page.GetByID(r.Domain, 1, false), p.Route, baseURL))
-	html = strings.ReplaceAll(html, `#BREADCRUMB#`, GetBreadcrumbLinks(r.Domain, p, baseURL))
+	html = strings.ReplaceAll(html, `#BREADCRUMB#`, GetBreadcrumbLinks(r, p, baseURL))
 	html = strings.ReplaceAll(html, `#CONTENT#`, p.Content)
 	html = strings.ReplaceAll(html, `#DAY#`, fmt.Sprint(day))
 	html = strings.ReplaceAll(html, `#MONTH#`, fmt.Sprint(month))
@@ -146,7 +146,7 @@ func getDayArchiveLinks(year int, month time.Month, baseURL string) []string {
 	links := []string{}
 	for _, posts := range archive.GetDays(year, month) {
 		for _, p := range posts {
-			links = append(links, fmt.Sprintf("<li>%s %s</li>", p.PubDate.Format("2006-01-02 15:04 Monday"), getHref(p, "-", baseURL)))
+			links = append(links, fmt.Sprintf("<li>%s %s</li>", getHref(p, "-", baseURL), p.PubDate.Format("Monday _2 15:04")))
 		}
 	}
 	return links
@@ -222,17 +222,17 @@ func getHref(p page.Info, route string, baseURL string) string {
 }
 
 // GetBreadcrumbLinks returns a trail of links from the home page to the current page
-func GetBreadcrumbLinks(domain string, p page.Info, baseURL string) string {
+func GetBreadcrumbLinks(r request.Info, p page.Info, baseURL string) string {
 	pages := []page.Info{p}
 	pid := p.Parent
 	for pid > 0 {
-		parentPage := page.GetByID(domain, pid, false)
+		parentPage := page.GetByID(r.Domain, pid, false)
 		pages = append([]page.Info{parentPage}, pages...)
 		pid = parentPage.Parent
 	}
 	links := []string{}
 	for _, bp := range pages {
-		links = append(links, getHref(bp, p.Route, baseURL))
+		links = append(links, getHref(bp, r.Route, baseURL))
 	}
 	return strings.Join(links, " > ")
 }
