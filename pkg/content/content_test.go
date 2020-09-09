@@ -95,20 +95,29 @@ func TestGenerateArchive(t *testing.T) {
 	page.LoadData("test")
 	r := request.Info{}
 	baseURL := "test.com"
-	got := len(generateArchive(r, baseURL))
-	want := 7723
+	p := page.Info{}
+	arch := generateArchive(r, baseURL, &p)
+	got := len(arch)
+	want := 7992
 	if got != want {
 		t.Errorf("Want %d got %d", want, got)
 	}
 	r.SubRoutes = append(r.SubRoutes, "2015")
-	got = len(generateArchive(r, baseURL))
-	want = 1892
+	arch = generateArchive(r, baseURL, &p)
+	gots := p.Title
+	wants := "Archives for 2015"
+	if gots != wants {
+		t.Errorf("Want %s got %s", wants, gots)
+	}
+	got = len(arch)
+	want = 1914
 	if got != want {
 		t.Errorf("Want %d got %d", want, got)
 	}
 	r.SubRoutes = append(r.SubRoutes, "01")
-	got = len(generateArchive(r, baseURL))
-	want = 75
+	arch = generateArchive(r, baseURL, &p)
+	got = len(arch)
+	want = 67
 	if got != want {
 		t.Errorf("Want %d got %d", want, got)
 	}

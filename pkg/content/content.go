@@ -32,8 +32,7 @@ func ReplaceTokens(r request.Info, html string, p page.Info) string {
 	html = strings.ReplaceAll(html, `#DAY#`, fmt.Sprint(day))
 	html = strings.ReplaceAll(html, `#MONTH#`, fmt.Sprint(month))
 	html = strings.ReplaceAll(html, `#YEAR#`, fmt.Sprint(year))
-	html = strings.ReplaceAll(html, `#ARCHIVE#`, generateArchive(r, baseURL))
-	html = strings.ReplaceAll(html, `#RECENT#`, addRecentPostsLinks(html, baseURL))
+	html = strings.ReplaceAll(html, `#ARCHIVE#`, generateArchive(r, baseURL, &p))
 	html = strings.ReplaceAll(html, `#PAGESINCATEGORY#`, getPagesInCategory(p, baseURL))
 	html = strings.ReplaceAll(html, `#TITLE#`, p.Title)
 	html = addMenus(html, baseURL, r.Route)
@@ -101,16 +100,21 @@ func getScripts() string {
 	return strings.Join(html, "\n")
 }
 
-func generateArchive(r request.Info, baseURL string) string {
+func generateArchive(r request.Info, baseURL string, p *page.Info) string {
 	// The outer HTML will likely be UL tags in the template since a css class may be applied to it
 	var links []string
 	switch len(r.SubRoutes) {
 	case 0:
 		links = getYearArchiveLinks(baseURL)
 	case 1:
-		links = getMonthArchiveLinks(getInt(r.SubRoutes[0]), baseURL)
+		year := getInt(r.SubRoutes[0])
+		p.Title = fmt.Sprintf("Archives for %d", year)
+		links = getMonthArchiveLinks(year, baseURL)
 	case 2:
-		links = getDayArchiveLinks(getInt(r.SubRoutes[0]), time.Month(getInt(r.SubRoutes[1])), baseURL)
+		year := getInt(r.SubRoutes[0])
+		month := time.Month(getInt(r.SubRoutes[1]))
+		p.Title = fmt.Sprintf("Archives for %s %d", month, year)
+		links = getDayArchiveLinks(year, month, baseURL)
 	}
 	return strings.Join(links, "\n")
 }
