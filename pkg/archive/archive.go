@@ -6,14 +6,16 @@ import (
 	"time"
 )
 
-// Record type
+// Record type that allows us to use a common index value for the various kinds of archive lists, be they in a map or a slice.
+// Then it is easy to sort the order of the lists.
+// Ranging over a map in Go is in a random order by design, and before, I used a mix of index types (int and time.Month).
 type Record struct {
-	Month time.Month
-	Count int
-	Posts []page.Info
+	Count int         // This represents the number of records in the current map
+	Month time.Month  // This is only used when we want to record the related time.Month value
+	Posts []page.Info // This is only used when we want to record a list of relevant pages
 }
 
-// GetYears - get a slice of years containing posts with the post count
+// GetYears - get a map of years containing posts with the post count
 func GetYears() map[int]Record {
 	years := make(map[int]Record)
 	pages := page.GetAllPages()
@@ -72,7 +74,8 @@ func GetDays(year int, month time.Month) map[int]Record {
 	return days
 }
 
-// GetKeysInOrder sorts map keys in order since ranging over a map is done in random order
+// GetKeysInOrder returns a sorted slice of map keys, since ranging over a map is done in a random order.
+// We need this []int to index into the map in order to render ordered lists.
 func GetKeysInOrder(items map[int]Record) []int {
 	// Make slice to store keys
 	keys := make([]int, len(items))
