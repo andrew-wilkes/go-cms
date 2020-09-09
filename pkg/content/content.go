@@ -126,10 +126,15 @@ func getInt(str string) int {
 
 func getYearArchiveLinks(baseURL string) []string {
 	links := []string{}
-	for year, count := range archive.GetYears() {
-		links = append(links, fmt.Sprintf(`<li><a href="%s/archive/%d">%d</a> (%d)</li>`, baseURL, year, year, count))
+	years := archive.GetYears()
+	keys := archive.GetKeysInOrder(years)
+	// Loop from most recent year
+	for i := len(keys) - 1; i >= 0; i-- {
+		key := keys[i]
+		year := years[key]
+		links = append(links, fmt.Sprintf(`<li><a href="%s/archive/%d">%d</a> (%d)</li>`, baseURL, key, key, year.Count))
 		links = append(links, "<ul>")
-		links = append(links, getMonthArchiveLinks(year, baseURL)...)
+		links = append(links, getMonthArchiveLinks(key, baseURL)...)
 		links = append(links, "</ul>")
 	}
 	return links
@@ -137,10 +142,13 @@ func getYearArchiveLinks(baseURL string) []string {
 
 func getMonthArchiveLinks(year int, baseURL string) []string {
 	links := []string{}
-	for month, count := range archive.GetMonths(year) {
-		links = append(links, fmt.Sprintf(`<li><a href="%s/archive/%d/%d">%s</a> (%d)</li>`, baseURL, year, int(month), month, count))
+	months := archive.GetMonths(year)
+	keys := archive.GetKeysInOrder(months)
+	for _, key := range keys {
+		month := months[key]
+		links = append(links, fmt.Sprintf(`<li><a href="%s/archive/%d/%d">%s</a> (%d)</li>`, baseURL, year, key, month.Month, month.Count))
 		links = append(links, "<ul>")
-		links = append(links, getDayArchiveLinks(year, month, baseURL)...)
+		links = append(links, getDayArchiveLinks(year, month.Month, baseURL)...)
 		links = append(links, "</ul>")
 	}
 	return links
@@ -148,8 +156,10 @@ func getMonthArchiveLinks(year int, baseURL string) []string {
 
 func getDayArchiveLinks(year int, month time.Month, baseURL string) []string {
 	links := []string{}
-	for _, posts := range archive.GetDays(year, month) {
-		for _, p := range posts {
+	days := archive.GetDays(year, month)
+	keys := archive.GetKeysInOrder(days)
+	for _, key := range keys {
+		for _, p := range days[key].Posts {
 			links = append(links, fmt.Sprintf("<li>%s %s</li>", getHref(p, "-", baseURL), p.PubDate.Format("Monday _2 15:04")))
 		}
 	}

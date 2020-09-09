@@ -43,7 +43,7 @@ func TestGetDayArchiveLinks(t *testing.T) {
 		println(day)
 		got = day
 	}
-	want := `<li>2015`
+	want := `<li><a href="test.com/blog/3-0-3`
 	if !strings.HasPrefix(got, want) {
 		t.Errorf("Want %s got %s", want, got)
 	}
@@ -128,7 +128,7 @@ func TestGetPagesInCategory(t *testing.T) {
 	page.LoadData("test")
 	pages := getPagesInCategory(page.Info{ID: 601}, "test.com")
 	got := len(pages)
-	want := 166
+	want := 178
 	if got != want {
 		t.Errorf("Want %d got %d", want, got)
 	}
