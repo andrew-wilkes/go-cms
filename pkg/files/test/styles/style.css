@@ -1,0 +1,43 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: sans-serif;
+    color: rgb(49, 49, 49);
+    background-color: #08f
+}
+a img {
+    border: none
+}
+.header, .footer {
+    width: 100%;
+    background-color: #0af;
+    padding: 0
+}      
+.header li, .footer li {
+    display: inline;
+    margin-right: 10px
+}
+
+.header ul a, .footer ul a {
+    color: #666;
+}
+
+.header ul, .footer ul {
+    padding-left: 0;
+    color: #666;
+}
+.column {
+    min-width: 20%;
+    min-height: 300px;
+    background-color: #eef;
+    padding: 20px;
+    float: left;
+    border-left: 20px solid #0af;
+    margin: 20px 0 20px 20px;      
+}
+.footer {
+    clear: both;
+}
+.container {
+    padding: 20px;
+}
