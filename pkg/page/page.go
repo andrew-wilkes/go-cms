@@ -189,10 +189,10 @@ func GetRecentPosts(n int, getContent bool, domain string) []Info {
 	for i := len(pages) - 1; i >= 0; i-- {
 		p := pages[i]
 		if p.Status == Published && p.Template == "post" {
-			posts[count] = p
 			if getContent {
 				p.Content = LoadContent(domain, p.ID)
 			}
+			posts[count] = p
 			count++
 			if count == n {
 				break

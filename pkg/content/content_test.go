@@ -123,6 +123,16 @@ func TestGenerateArchive(t *testing.T) {
 	}
 }
 
+func TestAddPosts(t *testing.T) {
+	files.Root = "../files/"
+	page.LoadData("test")
+	got := addPosts("test", "abc #POSTS_1#", "test.com")
+	want := "Read more"
+	if !strings.Contains(got, "Read more") {
+		t.Errorf("Want %s got %s", want, got)
+	}
+}
+
 func TestGetPagesInCategory(t *testing.T) {
 	files.Root = "../files/"
 	page.LoadData("test")

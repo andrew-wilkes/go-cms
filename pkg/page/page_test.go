@@ -197,7 +197,13 @@ func addPage(title string, route string, id int, parent int, template string, ca
 		Menus:    []string{menu},
 		PubDate:  pubDate,
 	})
-	SaveContent("test", id, title)
+
+	content := "Content for " + title
+	if id == 384 {
+		content = "before#MORE#after"
+	}
+
+	SaveContent("test", id, content)
 }
 
 func TestGetRecentPosts(t *testing.T) {

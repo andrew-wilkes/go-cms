@@ -37,11 +37,13 @@ func ReplaceTokens(r request.Info, html string, p page.Info) string {
 	html = strings.ReplaceAll(html, `#PAGESINCATEGORY#`, getPagesInCategory(p, baseURL))
 	html = strings.ReplaceAll(html, `#TITLE#`, p.Title)
 	html = strings.ReplaceAll(html, "#DESCRIPTION#", p.Description)
+	html = strings.Replace(html, "#COMMENTS#", "", 1)
 	html = addMenus(html, baseURL, r.Route)
 	html = addPageLinks(html, baseURL, p)
 	html = addCategoryLinks(html, baseURL, p)
 	html = addRecentPostsLinks(html, baseURL)
 	html = addPosts(r.Domain, html, baseURL)
+	html = strings.Replace(html, "#MORE#", "", 1)
 	return html
 }
 
@@ -133,6 +135,11 @@ func addPosts(domain string, html string, baseURL string) string {
 			t = strings.Replace(t, "#DAY#", fmt.Sprint(day), 1)
 			t = strings.Replace(t, "#TITLE#", p.Title, 1)
 			t = strings.Replace(t, "#DESCRIPTION#", p.Description, 1)
+			subStr := strings.Split(p.Content, "#MORE#")
+			if len(subStr) > 1 {
+				p.Title = "Read more ..."
+				p.Content = fmt.Sprintf(`%s<p class="more">%s</p>`, subStr[0], getHref(p, "", baseURL))
+			}
 			t = strings.Replace(t, "#CONTENT#", p.Content, 1)
 			content = append(content, t)
 		}
