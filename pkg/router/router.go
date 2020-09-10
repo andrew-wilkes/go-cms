@@ -20,6 +20,10 @@ func Process(r request.Info) ([]string, string) {
 		headers = append(headers, "HTTP/1.1 404 Not Found")
 		html = "Page not found at: " + r.Route
 	} else {
+		if page.Template == "post" {
+			// Avoid duplicate content issues with blog posts
+			headers = append(headers, "rel: canonical")
+		}
 		template := files.GetTemplate(r.Domain, page.Template)
 		html = content.ReplaceTokens(r, template, page)
 	}
