@@ -64,24 +64,40 @@ func TestSaveContent(t *testing.T) {
 	os.Remove(fn)
 }
 
+func TestCountPagesInCategory(t *testing.T) {
+	files.Root = "../files/"
+	LoadData("test")
+	got := CountPagesInCategory(601)
+	want := 3
+	if got != want {
+		t.Errorf("Want %d got %d", want, got)
+	}
+}
+
 func TestGeneratePages(t *testing.T) {
 	files.Root = "../files/"
 	pubDate := time.Now()
 	// Set the root empty page
 	pages = []Info{Info{Parent: -1}}
 	id := 0
+	title := "Home Page"
+	template := "home"
+	cat := 0
 	for a := 0; a < 4; a++ {
 		id++
 		aid := id
-		addPage("Home Page", fmt.Sprintf("%d", a), aid, 0, "home", 601, pubDate)
+		addPage(title, fmt.Sprintf("%d", a), aid, 0, template, cat, pubDate)
+		title = "Page "
+		template = "page"
+		cat = 601
 		for b := 0; b < 4; b++ {
 			id++
 			bid := id
-			addPage("Page ", fmt.Sprintf("%d-%d", a, b), bid, aid, "page", 602, pubDate)
+			addPage(title, fmt.Sprintf("%d-%d", a, b), bid, aid, "page", 602, pubDate)
 			for c := 0; c < 4; c++ {
 				id++
 				cid := id
-				addPage("Page ", fmt.Sprintf("%d-%d-%d", a, b, c), cid, bid, "page", 603, pubDate)
+				addPage(title, fmt.Sprintf("%d-%d-%d", a, b, c), cid, bid, "page", 603, pubDate)
 			}
 		}
 	}
@@ -153,7 +169,7 @@ func TestGetPages(t *testing.T) {
 }
 
 func addPage(title string, route string, id int, parent int, template string, category int, pubDate time.Time) {
-	if template == "post" || template == "page" {
+	if template == "post" || template == "page" || id > 600 && template == "category" {
 		title += route
 	}
 	if route == "0" {

@@ -149,6 +149,17 @@ func GetPagesInCategory(id int) []Info {
 	return list
 }
 
+// CountPagesInCategory returns the count of pages in a category
+func CountPagesInCategory(id int) int {
+	n := 0
+	for _, p := range pages {
+		if p.Category == id && p.Status == Published && p.Template != "category" {
+			n++
+		}
+	}
+	return n
+}
+
 // GetPagesInMenu returns a slice of pages and posts in a menu
 func GetPagesInMenu(menu string) []Info {
 	list := []Info{}

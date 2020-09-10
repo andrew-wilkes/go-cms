@@ -46,9 +46,15 @@ func addMenus(html string, baseURL string, route string) string {
 	re, _ := regexp.Compile(`#(\w+)_MENU#`) // e.g. SIDE_MENU
 	m := re.FindAllStringSubmatch(html, -1)
 	if m != nil {
+		m2 := ""
 		for _, token := range m {
-			menu := makeHTMLList(page.GetPagesInMenu(strings.ToLower(token[1])), route, baseURL)
-			html = strings.ReplaceAll(html, token[0], menu)
+			m1 := strings.ToLower(token[1])
+			// Avoid repetition
+			if m1 != m2 {
+				menu := makeHTMLList(page.GetPagesInMenu(m1), route, baseURL)
+				html = strings.ReplaceAll(html, token[0], menu)
+			}
+			m2 = m1
 		}
 	}
 	return html
@@ -58,9 +64,15 @@ func addPageLinks(html string, baseURL string, currentPage page.Info) string {
 	re, _ := regexp.Compile(`#PAGES_(\d)#`) // e.g. #PAGES_2# to get a list that is 2 levels deep
 	m := re.FindAllStringSubmatch(html, -1)
 	if m != nil {
+		lastDepth := 0
 		for _, token := range m {
-			list := strings.Join(getPageLinks(currentPage, baseURL, getInt(token[1]), "page"), "\n")
-			html = strings.ReplaceAll(html, token[0], list)
+			depth := getInt(token[1])
+			// Avoid repetition
+			if lastDepth != depth {
+				list := strings.Join(getPageLinks(currentPage, baseURL, getInt(token[1]), "page"), "\n")
+				html = strings.ReplaceAll(html, token[0], list)
+			}
+			lastDepth = depth
 		}
 	}
 	return html
@@ -70,9 +82,15 @@ func addCategoryLinks(html string, baseURL string, currentPage page.Info) string
 	re, _ := regexp.Compile(`#CATEGORIES_(\d)#`) // e.g. #CATEGORIES_2# to get a list that is 2 levels deep
 	m := re.FindAllStringSubmatch(html, -1)
 	if m != nil {
+		lastDepth := 0
 		for _, token := range m {
-			list := strings.Join(getCategoryLinks(currentPage, baseURL, getInt(token[1])), "\n")
-			html = strings.ReplaceAll(html, token[0], list)
+			depth := getInt(token[1])
+			// Avoid repetition
+			if lastDepth != depth {
+				list := strings.Join(getCategoryLinks(currentPage, baseURL, depth), "\n")
+				html = strings.ReplaceAll(html, token[0], list)
+			}
+			lastDepth = depth
 		}
 	}
 	return html
@@ -82,9 +100,15 @@ func addRecentPostsLinks(html string, baseURL string) string {
 	re, _ := regexp.Compile(`#RECENT_(\d+)#`) // e.g. #RECENT_10# to get a list of 10 posts
 	m := re.FindAllStringSubmatch(html, -1)
 	if m != nil {
+		lastDepth := 0
 		for _, token := range m {
-			list := makeHTMLList(page.GetRecentPosts(getInt(token[1])), "-", baseURL)
-			html = strings.ReplaceAll(html, token[0], list)
+			depth := getInt(token[1])
+			// Avoid repetition
+			if lastDepth != depth {
+				list := makeHTMLList(page.GetRecentPosts(getInt(token[1])), "-", baseURL)
+				html = strings.ReplaceAll(html, token[0], list)
+			}
+			lastDepth = depth
 		}
 	}
 	return html
@@ -209,7 +233,7 @@ func getCategoryLinks(p page.Info, base string, depth int) []string {
 			if depth > 1 {
 				subCatLinks = fmt.Sprintf("\n<ul>%s</ul>\n", strings.Join(getCategoryLinks(c, base, depth-1), ""))
 			}
-			links = append(links, fmt.Sprintf("<li>%s%s</li>\n", getHref(c, p.Route, base), subCatLinks))
+			links = append(links, fmt.Sprintf("<li>%s  (%d)%s</li>\n", getHref(c, p.Route, base), page.CountPagesInCategory(c.ID), subCatLinks))
 		}
 	}
 	return links

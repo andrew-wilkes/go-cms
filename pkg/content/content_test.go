@@ -128,7 +128,7 @@ func TestGetPagesInCategory(t *testing.T) {
 	page.LoadData("test")
 	pages := getPagesInCategory(page.Info{ID: 601}, "test.com")
 	got := len(pages)
-	want := 178
+	want := 125
 	if got != want {
 		t.Errorf("Want %d got %d", want, got)
 	}
@@ -157,7 +157,7 @@ func TestAddPageLinks(t *testing.T) {
 func TestAddCategoryLinks(t *testing.T) {
 	files.Root = "../files/"
 	page.LoadData("test")
-	got := addCategoryLinks("aaa #CATEGORIES_1# bbb", "test.com", page.Info{ID: 999})
+	got := addCategoryLinks("aaa #CATEGORIES_1# bbb", "test.com", page.Info{ID: 600})
 	want := "aaa <li><a"
 	if !strings.HasPrefix(got, want) {
 		t.Errorf("Want %s got %s", want, got)
