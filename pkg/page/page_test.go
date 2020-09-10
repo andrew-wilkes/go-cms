@@ -103,6 +103,8 @@ func TestGeneratePages(t *testing.T) {
 	}
 	id++
 	addPage("Archives", "archive", id, 0, "archive", 0, time.Now())
+	id++
+	addPage("Blog", "blog", id, 0, "blog", 0, time.Now())
 	SaveData("test")
 }
 
@@ -177,7 +179,7 @@ func addPage(title string, route string, id int, parent int, template string, ca
 	}
 	menu := "-"
 	switch id {
-	case 1, 85, 600:
+	case 1, 85, 86, 600:
 		menu = "top"
 	case 2, 3, 4, 5:
 		menu = "side"
@@ -202,7 +204,7 @@ func TestGetRecentPosts(t *testing.T) {
 	files.Root = "../files/"
 	LoadData("test")
 	want := 10
-	posts := GetRecentPosts(want)
+	posts := GetRecentPosts(want, false, "")
 	got := len(posts)
 	if got != want {
 		t.Errorf("Want %d got %d", want, got)

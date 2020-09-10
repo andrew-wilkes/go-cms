@@ -3,6 +3,7 @@ package content
 import (
 	"fmt"
 	"gocms/pkg/archive"
+	"gocms/pkg/files"
 	"gocms/pkg/page"
 	"gocms/pkg/request"
 	"gocms/pkg/user"
@@ -35,10 +36,12 @@ func ReplaceTokens(r request.Info, html string, p page.Info) string {
 	html = strings.ReplaceAll(html, `#ARCHIVE#`, generateArchive(r, baseURL, &p))
 	html = strings.ReplaceAll(html, `#PAGESINCATEGORY#`, getPagesInCategory(p, baseURL))
 	html = strings.ReplaceAll(html, `#TITLE#`, p.Title)
+	html = strings.ReplaceAll(html, "#DESCRIPTION#", p.Description)
 	html = addMenus(html, baseURL, r.Route)
 	html = addPageLinks(html, baseURL, p)
 	html = addCategoryLinks(html, baseURL, p)
 	html = addRecentPostsLinks(html, baseURL)
+	html = addPosts(r.Domain, html, baseURL)
 	return html
 }
 
@@ -105,11 +108,35 @@ func addRecentPostsLinks(html string, baseURL string) string {
 			depth := getInt(token[1])
 			// Avoid repetition
 			if lastDepth != depth {
-				list := makeHTMLList(page.GetRecentPosts(getInt(token[1])), "-", baseURL)
+				list := makeHTMLList(page.GetRecentPosts(getInt(token[1]), false, ""), "-", baseURL)
 				html = strings.ReplaceAll(html, token[0], list)
 			}
 			lastDepth = depth
 		}
+	}
+	return html
+}
+
+func addPosts(domain string, html string, baseURL string) string {
+	re, _ := regexp.Compile(`#POSTS_(\d+)#`) // e.g. #POSTS_1# to insert 1 post
+	m := re.FindAllStringSubmatch(html, -1)
+	if m != nil {
+		token := m[0]
+		template := files.GetTemplate(domain, "inline-post")
+		posts := page.GetRecentPosts(getInt(token[1]), true, domain)
+		content := []string{}
+		for _, p := range posts {
+			year, month, day := p.PubDate.Date()
+			t := template
+			t = strings.Replace(t, "#YEAR#", fmt.Sprint(year), 1)
+			t = strings.Replace(t, "#MONTH#", fmt.Sprint(month), 1)
+			t = strings.Replace(t, "#DAY#", fmt.Sprint(day), 1)
+			t = strings.Replace(t, "#TITLE#", p.Title, 1)
+			t = strings.Replace(t, "#DESCRIPTION#", p.Description, 1)
+			t = strings.Replace(t, "#CONTENT#", p.Content, 1)
+			content = append(content, t)
+		}
+		html = strings.Replace(html, token[0], strings.Join(content, "\n"), 1)
 	}
 	return html
 }
@@ -187,11 +214,6 @@ func getDayArchiveLinks(year int, month time.Month, baseURL string) []string {
 			links = append(links, fmt.Sprintf("<li>%s %s</li>", getHref(p, "-", baseURL), p.PubDate.Format("Monday _2 15:04")))
 		}
 	}
-	return links
-}
-
-func getPostLinks(posts []page.Info) []string {
-	links := []string{}
 	return links
 }
 

@@ -41,3 +41,10 @@ a img {
 .container {
     padding: 20px;
 }
+.author {
+    font-size: .8em;
+    font-weight: bold;
+}
+.date {
+    font-size: .7em;
+}

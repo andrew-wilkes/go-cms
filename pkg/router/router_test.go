@@ -12,11 +12,6 @@ func TestProcess(t *testing.T) {
 	Process(r)
 }
 
-func TestGetTemplate(t *testing.T) {
-	files.Root = "../files/"
-	GetTemplate("test", "home")
-}
-
 func TestExtractSubRoutes(t *testing.T) {
 	r := request.Info{Route: "/archive/a/b"}
 	r, pageRoute := ExtractSubRoutes(r)
