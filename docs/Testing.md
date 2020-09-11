@@ -1,33 +1,52 @@
+# Testing
 
+There are several ways of testing available:
 
-## Installation
+- unit testing of packages
+- deployment of test version of index.php
+- copying of test pages and data
 
-Some configuration options need to be set in a **config.toml** file. An example file is provided.
+## Unit Testing of Packages
+This is the standard way to test functions in a Go project.
 
-The **Makefile** contains commands to run scripts to:
-- build the code to place the app in the **/build** folder
-- deploy the app and other files to the server
-- copy generated page files for test purposes to the server
+Some tests require data to be set up and we must first generate the test data. This is done in the `page` package tests by running these test functions in sequence:
 
-The scripts folder contains php scripts that are used for the above tasks. The deploy script has a command line option (-l or --log) to deploy a test version of the installation.
+- TestGeneratePages
+- TestGeneratePosts
+- TestGeneratePosts
 
-The available **make** commands are:
-- make b
-- make deploy
-- make copy files
+This will create `pages.json` in the `files/test/data` folder and many html content files in `files/test/pages`.
 
-## Testing
+Then, in the code of the test, initialize the data with:
 
-The test version runs javascript code to make various kinds of web requests for testing and logging of the data. This data may be copied from the generated log file and used in unit tests with the go code.
+    files.Root = "../files/"
+	page.LoadData("test")
 
-Some unit tests scripts generate dummy page data which may be copied to the server for integration testing.
+Without doing this, there will be no test data to access.
 
-## Index page
+The code for generating the test data is all in the `page_test.go` file.
 
-The server needs to be configured to direct all requests to non-existant files or the home page to the **index.php** script when the website domain is accessed in a browser.
+## Deployment of test version
+It is annoying to test a web app by refreshing a browser with different user input and observing results in the browser. So there is a test version of index.php that allows us to capture request data for a variety of scenarious, save that data, and use the data in unit tests.
 
-The **index.php** captures all the server vars containing the requested page URI, method (POST/GET), and data. It then runs the Go app to process this data. The Go app then responds back to the PHP with response headers and page content.
+Previously captured data is in: `files/test/test-data-files/`
 
-During the deployment phase, the path to the Go app is baked into the PHP script.
+By running `make deploy -l` or `make deploy --log`, javascript code is inserted into the **index.php** script that performs a variety of http requests and logs the received data to files in a `log` folder.
 
-*More to follow ...*
+Then these data files may be copied to our test area for test file data.
+
+## Copying of Test Pages and Data
+By running the `make copyfiles` command, the test page data and content files will be copied to the server after erasing the old data and content files that were on the server before.
+
+Now we can browse the website to check out the navigation and rendering with this dummy test site content.
+
+## Notes
+If all of the unit tests pass (although not all features are covered by these tests), then the only cause of failure for the website to render should be a problem in the main `gocms.go` file.
+
+In the browser, there is likely development tools available to check Network requests to examine headers and responses. Pressing the F12 key normally activates this functionality.
+
+Running unit tests via `debug test` allows us to set breakpoints and then examine the state of the code.
+
+On a Linux server, we need to ensure that we have the file access permissions set up ok such as the user (you on the computer), web root folder, and web server software are in the same group since running a web app changes the group compared to running from the command line.
+
+Your PHP installation can be checked with `php -v` from the command line. Also, the **index.php** file can be run from the command line for a very basic check with `php index.php`.
