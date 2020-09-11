@@ -83,17 +83,31 @@ This package is responsible for saving and loading page data and content. It als
 ### content
 This package is responsible for assembling content and replacing tokens in templates with the content.
 
+Template tokens are comprised of upper-case text surrounded by hashes e.g. #TITLE# which would be replaced by the page title text.
+
+Other tokens include a data value such as a tag or digit count value. Examples are: #SIDE_MENU# and #PAGES_2# which specify the actual menu or the depth of the indented list of pages in a tree of parent-child relationships.
+
+It's best to have a look at the `content.go` source code to see all of the available tokens and the code that produces the associated content. It includes recursive functions and slice magic.
+
 ### settings
-This package is responsible for CRUD operations on application settings.
+This package is responsible for CRUD operations on application settings. At this moment, the actual settings that will be available are undefined.
 
 ### user
-This package is responsible for REST interactions related to the user login between the Admin app and the main App.
+This package is responsible for user login and status features.
 
 The user states are:
 - logged out
 - loggin in
 - unknown
 
+The user's IP address will be the thing that relates to stored previous status data to check if they are known or not. Then they will have to log in with password and email identity or register their details (author, email, password) to initialize the admin user account.
+
+The `author` name will be applied to the #AUTHOR# token in templates.
+
+The status data will be saved to a `data/status.json` file.
+
 ### api
 This package is responsible for REST interactions between the Admin app and the main App end points.
+
+The route will likely adopt a root path based on the config file settings. So rather than /api/... it could be /dashboard/... for example. This provides some measure of obscurity against bots scanning for the admin URL and identifying the CMS signature.
 
