@@ -52,6 +52,8 @@ func ProcessInput(jsonData string) ([]string, string) {
 		err = json.Unmarshal(_method, &r.Method)
 		_scheme := serverVars["REQUEST_SCHEME"] // http or https
 		err = json.Unmarshal(_scheme, &r.Scheme)
+		_ipAddr := serverVars["REMOTE_ADDR"]
+		err = json.Unmarshal(_ipAddr, &r.IPAddr)
 		var rawData string // contains any json POST data
 		_rawData := serverVars["RAW_DATA"]
 		err = json.Unmarshal(_rawData, &rawData)

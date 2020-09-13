@@ -9,6 +9,7 @@ type Info struct {
 	SubRoutes []string
 	Method    string
 	Scheme    string
+	IPAddr    string
 	GetArgs   map[string]string
 	PostData  map[string]json.RawMessage
 }
