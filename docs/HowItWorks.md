@@ -95,19 +95,22 @@ This package is responsible for CRUD operations on application settings. At this
 ### user
 This package is responsible for user login and status features.
 
-The user states are:
-- logged out
-- loggin in
-- unknown
+The user's Email value will be the thing that relates to stored previous status data to check if they are known or not.
 
-The user's IP address will be the thing that relates to stored previous status data to check if they are known or not. Then they will have to log in with password and email identity or register their details (author, email, password) to initialize the admin user account.
+They will log in with password and email identity or register their details (userName, email, password) to initialize the admin user account.
 
-The `author` name will be applied to the #AUTHOR# token in templates.
+The `userName` will be applied to the #AUTHOR# token in templates.
 
-The status data will be saved to a `data/status.json` file.
+The user data will be saved to a `data/settings.json` file.
+
+A session ID is provided to the client on a successful login, and this must be included (`?id=value`) with each subsequent request sent to the server, otherwise the user is assumed to be unknown or logged out. The session ID has an expiration time out 8 hours.
+
+User actions are:
+- LogOn (Compares the supplied credentials, and starts a new session)
+- LogOff (Deletes the session ID)
+- Register (Also has the effect of updating the user details if they are loggin in)
 
 ### api
-This package is responsible for REST interactions between the Admin app and the main App end points.
+This package is responsible for REST interactions between the Dashboard, Content Editor, and the main App end points.
 
-The route will likely adopt a root path based on the config file settings. So rather than /api/... it could be /dashboard/... for example. This provides some measure of obscurity against bots scanning for the admin URL and identifying the CMS signature.
-
+In order to process actions, it will compare the session ID to that supplied as an ID from the client. If not authorized, it will prompt for log-in credentials.
