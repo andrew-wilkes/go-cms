@@ -43,7 +43,7 @@ The data is put into a `reqest.Info` structure.
 Then we pass the data to the **router** package for processing into return values of headers and content.
 
 ### request
-This package simply contains an Info data structure which is depended on by other packages.
+This package simply contains an Info data structure for the input request data to functions which is depended on by other packages.
 
     type Info struct {
         Domain    string
@@ -55,7 +55,20 @@ This package simply contains an Info data structure which is depended on by othe
         PostData  map[string]json.RawMessage
     }
 
+### response
+This package simply contains an Info data structure for the output response data from functions feeding pack to the final output response of the App.
 
+    type Info struct {
+        ID   string
+        Data string
+        Msg  string
+    }
+
+The ID is empty for failed tasks, and equal to the current session ID otherwise.
+
+The Data is for any expected response data such as for page data.
+
+The Msg is for message text that may be displayed to the user in the client App or a simple "ok" to indicate success completing the action.
 
 ### router
 The router package is concerned with routes, which are paths to pages. Some pages are special and utilize sub-routes that provide data to the page such as the **archive** page. The sub routes here are for year and month.
