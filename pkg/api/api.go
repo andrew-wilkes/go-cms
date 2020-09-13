@@ -9,20 +9,17 @@ import (
 	"time"
 )
 
-var data dataPacket
 var state settings.Values
 var authorized bool
 
 // Process takes action
-func Process(req request.Info, domain string) ([]string, string) {
-	// Decode the post data for user credentials
-	//err := json.Unmarshal(r.PostData["user"], &(data.user))
-	if len(r.SubRoutes) > 1 {
-		state = settings.Get(domain)
-		authorized = sessionValid(domain, req.GetArgs["id"])
-		class := r.SubRoutes[0]
-		action := r.SubRoutes[1]
-		var resp response.Info
+func Process(req request.Info) ([]string, string) {
+	var resp response.Info
+	if len(req.SubRoutes) > 1 {
+		state = settings.Get(req.Domain)
+		sessionValid(req.Domain, req.GetArgs["id"])
+		class := req.SubRoutes[0]
+		action := req.SubRoutes[1]
 		switch class {
 		case "user":
 			resp = userActions(action, req, resp)
@@ -52,10 +49,12 @@ func userActions(action string, req request.Info, resp response.Info) response.I
 }
 
 func pageActions(action string, req request.Info, resp response.Info) response.Info {
+	// Add actions related to saving edited page content from the in-page editor (Content Tools)
 	return resp
 }
 
 func pagesActions(action string, req request.Info, resp response.Info) response.Info {
+	// Add actions related to save and load of pages data from the Dashboard
 	return resp
 }
 
@@ -64,10 +63,5 @@ func sessionValid(domain string, id string) {
 		authorized = false
 	} else {
 		authorized = state.SessionID == id
-	}
-	if authorized {
-		response.id = id
-	} else {
-		response.id = ""
 	}
 }
