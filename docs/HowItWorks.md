@@ -103,7 +103,7 @@ The `userName` will be applied to the #AUTHOR# token in templates.
 
 The user data will be saved to a `data/settings.json` file.
 
-A session ID is provided to the client on a successful login, and this must be included (`?id=value`) with each subsequent request sent to the server, otherwise the user is assumed to be unknown or logged out. The session ID has an expiration time out 8 hours.
+A session ID is provided to the client on a successful login, and this must be included (`?id=value`) with each subsequent request sent to the server, otherwise the user is assumed to be unknown or logged out. The session ID has an expiration time out of 8 hours.
 
 User actions are:
 - LogOn (Compares the supplied credentials, and starts a new session)

@@ -35,6 +35,12 @@ type Info struct {
 	UpdateDate  time.Time // Time of the latest re-save
 }
 
+// EditInfo type used to send data from the Content Editor
+type EditInfo struct {
+	ID      int
+	Content string
+}
+
 // GetByID by ID a page or post
 func GetByID(domain string, id int, getContent bool) Info {
 	return find(domain, id, "-", getContent)
@@ -94,9 +100,21 @@ func LoadData(domain string) {
 	}
 }
 
+// LoadRawData loads the pages data from disk and returns
+func LoadRawData(domain string) []byte {
+	LoadData(domain)
+	b, _ := json.Marshal(pages)
+	return b
+}
+
 // SaveData saves the pages data to a file
 func SaveData(domain string) {
 	b, _ := json.Marshal(pages)
+	SaveRawData(domain, b)
+}
+
+// SaveRawData saves the raw JSON data to a disk
+func SaveRawData(domain string, b []byte) {
 	err := ioutil.WriteFile(files.Root+domain+pagesFile, b, 0660)
 	if err != nil {
 		panic(err)

@@ -64,16 +64,6 @@ func TestSaveContent(t *testing.T) {
 	os.Remove(fn)
 }
 
-func TestCountPagesInCategory(t *testing.T) {
-	files.Root = "../files/"
-	LoadData("test")
-	got := CountPagesInCategory(601)
-	want := 3
-	if got != want {
-		t.Errorf("Want %d got %d", want, got)
-	}
-}
-
 func TestGeneratePages(t *testing.T) {
 	files.Root = "../files/"
 	pubDate := time.Now()
@@ -157,6 +147,16 @@ func TestGenerateCategoryPages(t *testing.T) {
 		}
 	}
 	SaveData("test")
+}
+
+func TestCountPagesInCategory(t *testing.T) {
+	files.Root = "../files/"
+	LoadData("test")
+	got := CountPagesInCategory(602)
+	want := 16
+	if got != want {
+		t.Errorf("Want %d got %d", want, got)
+	}
 }
 
 func TestGetPages(t *testing.T) {
