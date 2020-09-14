@@ -8,11 +8,13 @@ In most cases, they will be requests for content such as a web page. In other ca
 
 The admin end points will be according to a very simple REST API as follows:
 
-    /api/user
-    /api/page
-    /api/pages
-
-The request method (GET or POST) determines the kind of action requested such as get data or save data.
+    /api/user/logon
+    /api/user/logoff
+    /api/user/register
+    /api/page/load
+    /api/page/save
+    /api/pages/load
+    /api/pages/save 
 
 ## Request Handling
 When a request is received by the server, the **index.php** script first processes this request.
@@ -51,6 +53,7 @@ This package simply contains an Info data structure for the input request data t
         SubRoutes []string
         Method    string
         Scheme    string
+        IPAddr    string
         GetArgs   map[string]string
         PostData  map[string]json.RawMessage
     }
@@ -64,7 +67,7 @@ This package simply contains an Info data structure for the output response data
         Msg  string
     }
 
-The ID is empty for failed tasks, and equal to the current session ID otherwise.
+The ID is empty for failed tasks or when the session has expired, and equal to the current session ID otherwise.
 
 The Data is for any expected response data such as for page data.
 

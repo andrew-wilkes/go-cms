@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"gocms/pkg/files"
 	"io/ioutil"
+	"os"
 	"time"
 )
 
@@ -84,6 +85,14 @@ func SaveContent(domain string, id int, content string) {
 	}
 }
 
+// Delete deletes a page file
+func Delete(domain string, id int) {
+	err := os.Remove(fmt.Sprintf("%s%s/pages/%d.html", files.Root, domain, id))
+	if err != nil {
+		panic(err)
+	}
+}
+
 const pagesFile = "/data/pages.json"
 
 // LoadData loads the data from the pages data file
@@ -119,14 +128,6 @@ func SaveRawData(domain string, b []byte) {
 	if err != nil {
 		panic(err)
 	}
-}
-
-// Save a page or post
-func Save(domain string, info Info, saveContent bool) int {
-	if saveContent {
-		SaveContent(domain, info.ID, info.Content)
-	}
-	return 1
 }
 
 // GetPages returns a slice of pages data

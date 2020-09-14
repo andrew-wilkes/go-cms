@@ -10,21 +10,6 @@ import (
 	"time"
 )
 
-func TestGetByRoute(t *testing.T) {
-	files.Root = "../files/"
-	GetByRoute("test", "test_page", false)
-}
-
-func TestGetByID(t *testing.T) {
-	files.Root = "../files/"
-	p := GetByID("test", 2, false)
-	title := p.Title
-	want := "Page 0-0"
-	if title != want {
-		t.Errorf("Want %s got %s", want, title)
-	}
-}
-
 func TestSaveData(t *testing.T) {
 	files.Root = "../files/"
 	pages = []Info{Info{Title: "test"}}
@@ -47,21 +32,6 @@ func TestLoadData(t *testing.T) {
 	if title != "test" {
 		t.Errorf("Got %s want test after first running TestSaveData", title)
 	}
-}
-
-func TestSaveContent(t *testing.T) {
-	files.Root = "../files/"
-	SaveContent("test", 9999, "Test")
-	fn := files.Root + "test/pages/9999.html"
-	data, err := ioutil.ReadFile(fn)
-	if err != nil {
-		t.Errorf("Failed to save file")
-	}
-	content := string(data)
-	if content != "Test" {
-		t.Errorf("Got %s want Test", content)
-	}
-	os.Remove(fn)
 }
 
 func TestGeneratePages(t *testing.T) {
@@ -215,4 +185,34 @@ func TestGetRecentPosts(t *testing.T) {
 	if got != want {
 		t.Errorf("Want %d got %d", want, got)
 	}
+}
+
+func TestGetByRoute(t *testing.T) {
+	files.Root = "../files/"
+	GetByRoute("test", "test_page", false)
+}
+
+func TestGetByID(t *testing.T) {
+	files.Root = "../files/"
+	p := GetByID("test", 2, false)
+	title := p.Title
+	want := "Page 0-0"
+	if title != want {
+		t.Errorf("Want %s got %s", want, title)
+	}
+}
+
+func TestSaveContent(t *testing.T) {
+	files.Root = "../files/"
+	SaveContent("test", 9999, "Test")
+	fn := files.Root + "test/pages/9999.html"
+	data, err := ioutil.ReadFile(fn)
+	if err != nil {
+		t.Errorf("Failed to save file")
+	}
+	content := string(data)
+	if content != "Test" {
+		t.Errorf("Got %s want Test", content)
+	}
+	os.Remove(fn)
 }
