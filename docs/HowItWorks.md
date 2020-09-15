@@ -59,7 +59,7 @@ This package simply contains an Info data structure for the input request data t
     }
 
 ### response
-This package simply contains an Info data structure for the output response data from functions feeding pack to the final output response of the App.
+This package simply contains an Info data structure for the output response data from functions feeding back to the final output response of the App.
 
     type Info struct {
         ID   string

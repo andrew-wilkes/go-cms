@@ -9,3 +9,6 @@ test:
 
 copyfiles:
 	php scripts/copytestfiles.php
+
+g:
+	go run scripts/generate/generate.go
