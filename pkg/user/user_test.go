@@ -3,7 +3,6 @@ package user
 import (
 	"encoding/json"
 	"gocms/pkg/files"
-	"gocms/pkg/request"
 	"gocms/pkg/response"
 	"gocms/pkg/settings"
 	"strings"

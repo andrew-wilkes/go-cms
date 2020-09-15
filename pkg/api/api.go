@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"gocms/pkg/page"
-	"gocms/pkg/request"
 	"gocms/pkg/response"
 	"gocms/pkg/settings"
 	"gocms/pkg/user"
+	"net/http"
 	"strconv"
 	"time"
 )
@@ -16,13 +16,13 @@ var state settings.Values
 var authorized bool
 
 // Process takes action
-func Process(req request.Info) ([]string, string) {
+func Process(req *http.Request, subRoutes []string) ([]string, string) {
 	var resp response.Info
-	if len(req.SubRoutes) > 1 {
+	if len(subRoutes) > 1 {
 		state = settings.Get(req.Domain)
 		sessionValid(req.GetArgs["id"]) // If the key doesn't exist, then "" is passed maybe?
-		class := req.SubRoutes[0]
-		action := req.SubRoutes[1]
+		class := subRoutes[0]
+		action := subRoutes[1]
 		switch class {
 		case "user":
 			resp = userActions(action, req, resp)
@@ -36,7 +36,7 @@ func Process(req request.Info) ([]string, string) {
 	return []string{""}, string(b)
 }
 
-func userActions(action string, req request.Info, resp response.Info) response.Info {
+func userActions(action string, req *http.Request, resp response.Info) response.Info {
 	if action == "logon" {
 		resp = user.LogOn(req, resp)
 	}
@@ -51,7 +51,7 @@ func userActions(action string, req request.Info, resp response.Info) response.I
 	return resp
 }
 
-func pageActions(action string, req request.Info, resp response.Info) response.Info {
+func pageActions(action string, req *http.Request, resp response.Info) response.Info {
 	// Add actions related to saving edited page content from the in-page editor (Content Tools)
 	if authorized {
 		switch action {
@@ -83,7 +83,7 @@ func pageActions(action string, req request.Info, resp response.Info) response.I
 	return resp
 }
 
-func pagesActions(action string, req request.Info, resp response.Info) response.Info {
+func pagesActions(action string, req *http.Request, resp response.Info) response.Info {
 	// Add actions related to save and load of pages data from the Dashboard
 	if authorized {
 		switch action {

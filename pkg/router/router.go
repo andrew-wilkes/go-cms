@@ -7,44 +7,47 @@ import (
 	"gocms/pkg/content"
 	"gocms/pkg/files"
 	"gocms/pkg/page"
-	"gocms/pkg/request"
+	"net/http"
 	"strings"
 )
 
 // Process a request
-func Process(r request.Info) ([]string, string) {
-	r, pageRoute := ExtractSubRoutes(r)
-	headers := []string{}
+func Process(req *http.Request) (int, map[string]string, string) {
+	subRoutes, pageRoute := ExtractSubRoutes(r)
+	status := http.StatusOK
+	headers := map[string]string{}
+	domain := req.Host
 	html := ""
 	if pageRoute == "/api" {
-		return api.Process(r)
+		return api.Process(req, subRoutes)
 	}
-	page := page.GetByRoute(r.Domain, pageRoute, true)
+	page := page.GetByRoute(domain, pageRoute, true)
 	if page.ID == 0 {
-		headers = append(headers, "HTTP/1.1 404 Not Found")
-		html = "Page not found at: " + r.Route
+		status = http.StatusNotFound
+		html = "Page not found at: " + pageRoute
 	} else {
 		if page.Template == "post" {
 			// Avoid duplicate content issues with blog posts
-			headers = append(headers, "rel: canonical")
+			headers["rel"] = "canonical"
 		}
-		template := files.GetTemplate(r.Domain, page.Template)
+		template := files.GetTemplate(domain, page.Template)
 		html = content.ReplaceTokens(r, template, page)
 	}
-	return headers, html
+	return status, headers, html
 }
 
 // ExtractSubRoutes scans the route for special prefixes and uses the rest of the route to extract the subroutes
-func ExtractSubRoutes(r request.Info) (request.Info, string) {
+func ExtractSubRoutes(r *http.Request) ([]string, string) {
+	subRoutes := []string{}
 	stems := []string{"/archive", "/api"}
-	pageRoute := r.Route
+	pageRoute := r.RequestURI
 	for _, stem := range stems {
-		if strings.HasPrefix(r.Route, stem) {
-			tail := strings.Replace(r.Route, stem, "", 1)
-			r.SubRoutes = strings.Split(tail, "/")[1:]
+		if strings.HasPrefix(pageRoute, stem) {
+			tail := strings.Replace(pageRoute, stem, "", 1)
+			subRoutes = strings.Split(tail, "/")[1:]
 			pageRoute = stem
 			break
 		}
 	}
-	return r, pageRoute
+	return subRoutes, pageRoute
 }

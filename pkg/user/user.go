@@ -4,9 +4,9 @@ import (
 	"crypto/sha256"
 	"encoding/json"
 	"fmt"
-	"gocms/pkg/request"
 	"gocms/pkg/response"
 	"gocms/pkg/settings"
+	"net/http"
 	"time"
 
 	"github.com/rs/xid"
@@ -30,15 +30,16 @@ type Status struct {
 var cred Credentials
 
 // LogOn to the system
-func LogOn(req request.Info, resp response.Info) response.Info {
+func LogOn(req *http.Request, resp response.Info) response.Info {
 	ok := true
-	err := json.Unmarshal(req.PostData["user"], &cred)
+	decoder := json.NewDecoder(req.Body)
+	err := decoder.Decode(&cred)
 	if err != nil {
 		ok = false
 		resp.Msg = "Error decoding data!"
 
 	}
-	info := settings.Get(req.Domain)
+	info := settings.Get(req.Host)
 	if ok && info.Email != cred.Email {
 		ok = false
 		resp.Msg = "Unknown user!"
@@ -59,27 +60,28 @@ func LogOn(req request.Info, resp response.Info) response.Info {
 		resp.Data = string(data)
 		// Save the new info to settings
 		info.LastTime = time.Now()
-		info.LastIP = req.IPAddr
-		settings.Set(info, req.Domain)
+		info.LastIP = req.RemoteAddr
+		settings.Set(info, req.Host)
 	}
 	return resp
 }
 
 // LogOff from the App
-func LogOff(req request.Info, resp response.Info) response.Info {
-	info := settings.Get(req.Domain)
+func LogOff(req *http.Request, resp response.Info) response.Info {
+	info := settings.Get(req.Host)
 	info.SessionID = ""
 	info.SessionExpiry = time.Now()
-	settings.Set(info, req.Domain)
+	settings.Set(info, req.Host)
 	resp.Msg = "ok"
 	return resp
 }
 
 // Register with the App or update user details
-func Register(req request.Info, resp response.Info) response.Info {
-	info := settings.Get(req.Domain)
+func Register(req *http.Request, resp response.Info) response.Info {
+	info := settings.Get(req.Host)
 	ok := true
-	err := json.Unmarshal(req.PostData["user"], &cred)
+	decoder := json.NewDecoder(req.Body)
+	err := decoder.Decode(&cred)
 	if err != nil {
 		ok = false
 		resp.Msg = "Error decoding data!"
@@ -97,8 +99,8 @@ func Register(req request.Info, resp response.Info) response.Info {
 		info.SessionID = xid.New().String()
 		info.SessionExpiry = time.Now().Add(time.Hour * 8)
 		info.LastTime = time.Now()
-		info.LastIP = req.IPAddr
-		settings.Set(info, req.Domain)
+		info.LastIP = req.RemoteAddr
+		settings.Set(info, req.Host)
 		resp.ID = info.SessionID
 		resp.Msg = "ok"
 	}
