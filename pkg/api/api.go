@@ -21,7 +21,7 @@ func Process(req *http.Request, subRoutes []string) (int, map[string]string, str
 	var resp response.Info
 	if len(subRoutes) > 1 {
 		state = settings.Get(req.Host)
-		authorized = SessionValid(req.URL.Query()["id"])
+		authorized = user.SessionValid(req.URL.Query()["id"], req.Host)
 		class := subRoutes[0]
 		action := subRoutes[1]
 
