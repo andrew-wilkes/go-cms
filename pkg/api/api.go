@@ -11,7 +11,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strconv"
-	"time"
 )
 
 var state settings.Values
@@ -107,15 +106,4 @@ func pagesActions(action string, req *http.Request, resp response.Info) response
 		resp.Msg = "ok"
 	}
 	return resp
-}
-
-// SessionValid returns true if the user is logged in with a valid session ID
-func SessionValid(id []string) bool {
-	var authorized bool
-	if state.SessionExpiry.Before(time.Now()) || len(id) != 1 {
-		authorized = false
-	} else {
-		authorized = state.SessionID == id[0]
-	}
-	return authorized
 }

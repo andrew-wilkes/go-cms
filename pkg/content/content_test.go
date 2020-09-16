@@ -103,13 +103,13 @@ func TestGenerateArchive(t *testing.T) {
 	req.Host = "test"
 	baseURL := "test.com"
 	p := page.Info{}
-	arch := generateArchive(req, baseURL, &p, []string{})
+	arch := generateArchive(baseURL, &p, []string{})
 	got := len(arch)
 	want := 7992
 	if got != want {
 		t.Errorf("Want %d got %d", want, got)
 	}
-	arch = generateArchive(req, baseURL, &p, []string{"2015"})
+	arch = generateArchive(baseURL, &p, []string{"2015"})
 	gots := p.Title
 	wants := "Archives for 2015"
 	if gots != wants {
@@ -120,7 +120,7 @@ func TestGenerateArchive(t *testing.T) {
 	if got != want {
 		t.Errorf("Want %d got %d", want, got)
 	}
-	arch = generateArchive(req, baseURL, &p, []string{"2015", "01"})
+	arch = generateArchive(baseURL, &p, []string{"2015", "01"})
 	got = len(arch)
 	want = 67
 	if got != want {
