@@ -1,22 +1,27 @@
 package router
 
 import (
+	"bytes"
 	"gocms/pkg/files"
-	"gocms/pkg/request"
+	"net/http"
 	"testing"
 )
 
 func TestProcess(t *testing.T) {
 	files.Root = "../files/"
-	r := request.Info{Domain: "test", Route: "test_page"}
-	Process(r)
+	req, _ := http.NewRequest("GET", "", bytes.NewBufferString(""))
+	req.Host = "test"
+	req.RequestURI = "/test_page"
+	Process(req)
 }
 
 func TestExtractSubRoutes(t *testing.T) {
-	r := request.Info{Route: "/archive/a/b"}
-	r, pageRoute := ExtractSubRoutes(r)
+	req, _ := http.NewRequest("GET", "", bytes.NewBufferString(""))
+	req.Host = "base.com"
+	req.RequestURI = "/archive/a/b"
+	subRoutes, pageRoute := ExtractSubRoutes(req)
 	want := "b"
-	got := r.SubRoutes[1]
+	got := subRoutes[1]
 	if got != want {
 		t.Errorf("Got %s want %s", got, want)
 	}

@@ -12,3 +12,6 @@ copyfiles:
 
 g:
 	go run scripts/generate/generate.go
+
+test:
+	go test ./pkg/... ./cmd/...

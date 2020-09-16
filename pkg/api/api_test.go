@@ -1,49 +1,22 @@
 package api
 
 import (
+	"bytes"
 	"encoding/json"
 	"gocms/pkg/files"
 	"gocms/pkg/page"
-	"gocms/pkg/request"
 	"gocms/pkg/response"
-	"gocms/pkg/settings"
+	"io/ioutil"
+	"net/http"
 	"strings"
 	"testing"
-	"time"
 )
-
-func TestSessionValid(t *testing.T) {
-	// Session expired
-	state = settings.Values{
-		SessionExpiry: time.Now().AddDate(0, 0, -1),
-		SessionID:     "aaa",
-	}
-	sessionValid("aaa")
-	got := authorized
-	want := false
-	if got != want {
-		t.Errorf("Got %v want %v", got, want)
-	}
-	// Session not expired, wrong id
-	state.SessionExpiry = time.Now().AddDate(0, 0, 1)
-	sessionValid("z")
-	got = authorized
-	want = false
-	if got != want {
-		t.Errorf("Got %v want %v", got, want)
-	}
-	// Session not expired, correct id
-	sessionValid("aaa")
-	got = authorized
-	want = true
-	if got != want {
-		t.Errorf("Got %v want %v", got, want)
-	}
-}
 
 func TestUserActions(t *testing.T) {
 	files.Root = "../files/"
-	req := request.Info{Domain: "test"}
+	req, _ := http.NewRequest("POST", "", bytes.NewBufferString(""))
+	req.Header.Set("Content-Type", "application/json")
+	req.Host = "test"
 	res := response.Info{}
 	// No action
 	got := userActions("", req, res)
@@ -73,10 +46,9 @@ func TestUserActions(t *testing.T) {
 
 func TestPageActions(t *testing.T) {
 	files.Root = "../files/"
-	req := request.Info{
-		Domain:   "test",
-		PostData: map[string]json.RawMessage{},
-	}
+	req, _ := http.NewRequest("POST", "", bytes.NewBufferString(""))
+	req.Header.Set("Content-Type", "application/json")
+	req.Host = "test"
 	res := response.Info{}
 	// Save action blocked
 	authorized = false
@@ -88,24 +60,26 @@ func TestPageActions(t *testing.T) {
 	// Save action authorized
 	authorized = true
 	info := page.EditInfo{ID: 777, Content: "xyz"}
-	data, _ := json.Marshal(info)
-	req.PostData["info"] = data
+	requestBody, _ := json.Marshal(info)
+	req.Body = ioutil.NopCloser(bytes.NewBuffer(requestBody))
 	got = pageActions("save", req, res)
-	want = response.Info{Msg: "Error"}
 	if got.Msg != "ok" {
 		t.Errorf("Got %v want %v", got.Msg, "ok")
 	}
 	// Delete saved file
 	page.Delete("test", 777)
 	// Load file
-	req.GetArgs = map[string]string{"pid": "1"}
+	q := req.URL.Query()
+	q.Add("pid", "1")
+	req.URL.RawQuery = q.Encode()
 	got = pageActions("load", req, res)
 	want = response.Info{Msg: "ok"}
 	if got.Msg != want.Msg {
 		t.Errorf("Got %v want %v", got.Msg, want.Msg)
 	}
 	// Load file
-	req.GetArgs = map[string]string{"pid": "9999"}
+	q.Set("pid", "9999")
+	req.URL.RawQuery = q.Encode()
 	got = pageActions("load", req, res)
 	want = response.Info{Msg: "ok"}
 	if got.Msg == want.Msg {
@@ -116,7 +90,9 @@ func TestPageActions(t *testing.T) {
 func TestPagesActions(t *testing.T) {
 	files.Root = "../files/"
 	page.LoadData("test")
-	req := request.Info{Domain: "test"}
+	req, _ := http.NewRequest("POST", "", bytes.NewBufferString(""))
+	req.Header.Set("Content-Type", "application/json")
+	req.Host = "test"
 	res := response.Info{}
 	// Actions blocked
 	authorized = false
@@ -131,19 +107,21 @@ func TestPagesActions(t *testing.T) {
 	if len(got.Data) < 1 {
 		t.Errorf("Got no data trying to load")
 	}
-	rawData := json.RawMessage(got.Data)
-	req.PostData = map[string]json.RawMessage{"pages": rawData}
+	requestBody := json.RawMessage(got.Data)
+	req.Body = ioutil.NopCloser(bytes.NewBuffer(requestBody))
 	got = pagesActions("save", req, res)
 	got = pagesActions("load", req, res)
-	b, _ := json.Marshal(req.PostData["pages"])
+	b, _ := json.Marshal(requestBody)
 	if got.Data != string(b) {
 		t.Errorf("Got %v want %v", got.Data, string(b))
 	}
 }
 
 func TestProcess(t *testing.T) {
-	req := request.Info{}
-	_, response := Process(req)
+	req, _ := http.NewRequest("POST", "", bytes.NewBufferString(""))
+	req.Header.Set("Content-Type", "application/json")
+	req.Host = "test"
+	_, _, response := Process(req, []string{})
 	want := `{"ID":"","Data":"","Msg":""}`
 	if response != want {
 		t.Errorf("Got %s want %s", response, want)

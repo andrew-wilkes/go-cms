@@ -16,47 +16,15 @@ The admin end points will be according to a very simple REST API as follows:
     /api/pages/load
     /api/pages/save 
 
-## Request Handling
-When a request is received by the server, the **index.php** script first processes this request.
-
-The server global variable $_SERVER contains most of the request data and server vars except for posted data objects, so we add that data as another key value pair in the associated array (map).
-
-    $_SERVER['RAW_DATA'] = file_get_contents("php://input");
-
-Next, we JSON encode this data and execute the Go App with this data as a command line parameter. If all goes well, the App prints to standard output a response or to the error output if there is a panic (exception).
-
-We add a redirection of error output to standard output on the command line so that we are able to see the error message in the web page.
-
-With a correct response we will get zero or more headers to respond with to the client, and the HTML content to output.
-
 ## App Packages
 
 ### main
-The main entry point receives the data from the **index.php** calling script.
-
-The first command line argument contains the path to the App and we use this to set the path to our data files. This is necessary because the location of these files is different in our development environment where we run tests using dummy data.
-
-The second command line argument contains the JSON data string. We decode this to extract the data that we are interested in with the `ProcessInput` function.
 
 The URI is further processed with the `ParseURI` function to extract GET vars that may be present e.g. `/contact?a=2&b=3`
 
 The data is put into a `reqest.Info` structure.
 
 Then we pass the data to the **router** package for processing into return values of headers and content.
-
-### request
-This package simply contains an Info data structure for the input request data to functions which is depended on by other packages.
-
-    type Info struct {
-        Domain    string
-        Route     string
-        SubRoutes []string
-        Method    string
-        Scheme    string
-        IPAddr    string
-        GetArgs   map[string]string
-        PostData  map[string]json.RawMessage
-    }
 
 ### response
 This package simply contains an Info data structure for the output response data from functions feeding back to the final output response of the App.

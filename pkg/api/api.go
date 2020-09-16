@@ -2,27 +2,29 @@ package api
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"gocms/pkg/page"
-	"gocms/pkg/request"
 	"gocms/pkg/response"
 	"gocms/pkg/settings"
 	"gocms/pkg/user"
+	"io/ioutil"
+	"net/http"
 	"strconv"
-	"time"
 )
 
 var state settings.Values
 var authorized bool
 
 // Process takes action
-func Process(req request.Info) ([]string, string) {
+func Process(req *http.Request, subRoutes []string) (int, map[string]string, string) {
 	var resp response.Info
-	if len(req.SubRoutes) > 1 {
-		state = settings.Get(req.Domain)
-		sessionValid(req.GetArgs["id"]) // If the key doesn't exist, then "" is passed maybe?
-		class := req.SubRoutes[0]
-		action := req.SubRoutes[1]
+	if len(subRoutes) > 1 {
+		state = settings.Get(req.Host)
+		authorized = SessionValid(req.URL.Query()["id"])
+		class := subRoutes[0]
+		action := subRoutes[1]
+
 		switch class {
 		case "user":
 			resp = userActions(action, req, resp)
@@ -33,10 +35,10 @@ func Process(req request.Info) ([]string, string) {
 		}
 	}
 	b, _ := json.Marshal(resp)
-	return []string{""}, string(b)
+	return http.StatusOK, map[string]string{}, string(b)
 }
 
-func userActions(action string, req request.Info, resp response.Info) response.Info {
+func userActions(action string, req *http.Request, resp response.Info) response.Info {
 	if action == "logon" {
 		resp = user.LogOn(req, resp)
 	}
@@ -51,24 +53,32 @@ func userActions(action string, req request.Info, resp response.Info) response.I
 	return resp
 }
 
-func pageActions(action string, req request.Info, resp response.Info) response.Info {
+func pageActions(action string, req *http.Request, resp response.Info) response.Info {
 	// Add actions related to saving edited page content from the in-page editor (Content Tools)
 	if authorized {
 		switch action {
 		case "save":
 			var info page.EditInfo
-			err := json.Unmarshal(req.PostData["info"], &info)
+			decoder := json.NewDecoder(req.Body)
+			err := decoder.Decode(&info)
 			if err != nil {
 				resp.Msg = "Error decoding data!"
 			} else {
-				page.SaveContent(req.Domain, info.ID, info.Content)
+				page.SaveContent(req.Host, info.ID, info.Content)
 				resp.Msg = "ok"
 			}
 		// NOTE: This action is unnecessary with in-content editing
 		case "load":
-			i, er := strconv.Atoi(req.GetArgs["pid"])
-			if er == nil {
-				info := page.GetByID(req.Domain, i, true)
+			pid := req.URL.Query()["pid"]
+			var err error
+			var i int
+			if len(pid) != 1 {
+				err = errors.New("Missing pid")
+			} else {
+				i, err = strconv.Atoi(pid[0])
+			}
+			if err == nil {
+				info := page.GetByID(req.Host, i, true)
 				if info.ID == 0 {
 					resp.Msg = "Page not found!"
 				} else {
@@ -76,31 +86,24 @@ func pageActions(action string, req request.Info, resp response.Info) response.I
 					resp.Msg = "ok"
 				}
 			} else {
-				resp.Msg = fmt.Sprint(er)
+				resp.Msg = fmt.Sprint(err)
 			}
 		}
 	}
 	return resp
 }
 
-func pagesActions(action string, req request.Info, resp response.Info) response.Info {
+func pagesActions(action string, req *http.Request, resp response.Info) response.Info {
 	// Add actions related to save and load of pages data from the Dashboard
 	if authorized {
 		switch action {
 		case "save":
-			page.SaveRawData(req.Domain, []byte(req.PostData["pages"]))
+			data, _ := ioutil.ReadAll(req.Body)
+			page.SaveRawData(req.Host, data)
 		case "load":
-			resp.Data = string(page.LoadRawData(req.Domain))
+			resp.Data = string(page.LoadRawData(req.Host))
 		}
 		resp.Msg = "ok"
 	}
 	return resp
-}
-
-func sessionValid(id string) {
-	if state.SessionExpiry.Before(time.Now()) {
-		authorized = false
-	} else {
-		authorized = state.SessionID == id
-	}
 }
