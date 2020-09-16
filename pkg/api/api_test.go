@@ -121,7 +121,7 @@ func TestProcess(t *testing.T) {
 	req, _ := http.NewRequest("POST", "", bytes.NewBufferString(""))
 	req.Header.Set("Content-Type", "application/json")
 	req.Host = "test"
-	_, response := Process(req, []string{})
+	_, _, response := Process(req, []string{})
 	want := `{"ID":"","Data":"","Msg":""}`
 	if response != want {
 		t.Errorf("Got %s want %s", response, want)

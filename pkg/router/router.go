@@ -13,7 +13,7 @@ import (
 
 // Process a request
 func Process(req *http.Request) (int, map[string]string, string) {
-	subRoutes, pageRoute := ExtractSubRoutes(r)
+	subRoutes, pageRoute := ExtractSubRoutes(req)
 	status := http.StatusOK
 	headers := map[string]string{}
 	domain := req.Host
@@ -37,10 +37,10 @@ func Process(req *http.Request) (int, map[string]string, string) {
 }
 
 // ExtractSubRoutes scans the route for special prefixes and uses the rest of the route to extract the subroutes
-func ExtractSubRoutes(r *http.Request) ([]string, string) {
+func ExtractSubRoutes(req *http.Request) ([]string, string) {
 	subRoutes := []string{}
 	stems := []string{"/archive", "/api"}
-	pageRoute := r.RequestURI
+	pageRoute := req.RequestURI
 	for _, stem := range stems {
 		if strings.HasPrefix(pageRoute, stem) {
 			tail := strings.Replace(pageRoute, stem, "", 1)
