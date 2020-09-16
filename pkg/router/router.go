@@ -31,7 +31,7 @@ func Process(req *http.Request) (int, map[string]string, string) {
 			headers["rel"] = "canonical"
 		}
 		template := files.GetTemplate(domain, page.Template)
-		html = content.ReplaceTokens(r, template, page)
+		html = content.ReplaceTokens(req, template, page, subRoutes)
 	}
 	return status, headers, html
 }

@@ -1,11 +1,12 @@
 package content
 
 import (
+	"bytes"
 	"crypto/md5"
 	"fmt"
 	"gocms/pkg/files"
 	"gocms/pkg/page"
-	"gocms/pkg/request"
+	"net/http"
 	"strings"
 	"testing"
 )
@@ -15,7 +16,9 @@ func TestReplaceTokens(t *testing.T) {
 	page.LoadData("test")
 	html := "#TITLE# #TOPMENU# #CONTENT# #FOOTERMENU# #DATE# #SCRIPTS#"
 	page := page.Info{Title: "Test", Content: "Content"}
-	content := ReplaceTokens(request.Info{Scheme: "http", Domain: "test"}, html, page)
+	req, _ := http.NewRequest("GET", "", bytes.NewBufferString(""))
+	req.Host = "test"
+	content := ReplaceTokens(req, html, page, []string{})
 	println(content)
 	got := fmt.Sprintf("%x", md5.Sum([]byte(content)))
 	want := "90b74676249768fa7b9e78f1c444cecc"
@@ -29,7 +32,10 @@ func TestGetBreadcrumbLinks(t *testing.T) {
 	page.LoadData("test")
 	p := page.GetByID("test", 8, false)
 	want := `<a href="base.com/">Home Page</a> > <a href="base.com/0-1">Page 0-1</a> > Page 0-1-0`
-	got := GetBreadcrumbLinks(request.Info{Domain: "test", Route: p.Route}, p, "base.com")
+	req, _ := http.NewRequest("GET", p.Route, bytes.NewBufferString(""))
+	req.Host = "base.com"
+	req.RequestURI = "/0-1-0"
+	got := GetBreadcrumbLinks(req, p, "base.com")
 	if got != want {
 		t.Errorf("Want %s got %s", want, got)
 	}
@@ -93,17 +99,17 @@ func TestGetInt(t *testing.T) {
 func TestGenerateArchive(t *testing.T) {
 	files.Root = "../files/"
 	page.LoadData("test")
-	r := request.Info{}
+	req, _ := http.NewRequest("GET", "test.com", bytes.NewBufferString(""))
+	req.Host = "test"
 	baseURL := "test.com"
 	p := page.Info{}
-	arch := generateArchive(r, baseURL, &p)
+	arch := generateArchive(req, baseURL, &p, []string{})
 	got := len(arch)
 	want := 7992
 	if got != want {
 		t.Errorf("Want %d got %d", want, got)
 	}
-	r.SubRoutes = append(r.SubRoutes, "2015")
-	arch = generateArchive(r, baseURL, &p)
+	arch = generateArchive(req, baseURL, &p, []string{"2015"})
 	gots := p.Title
 	wants := "Archives for 2015"
 	if gots != wants {
@@ -114,8 +120,7 @@ func TestGenerateArchive(t *testing.T) {
 	if got != want {
 		t.Errorf("Want %d got %d", want, got)
 	}
-	r.SubRoutes = append(r.SubRoutes, "01")
-	arch = generateArchive(r, baseURL, &p)
+	arch = generateArchive(req, baseURL, &p, []string{"2015", "01"})
 	got = len(arch)
 	want = 67
 	if got != want {

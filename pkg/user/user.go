@@ -111,3 +111,14 @@ func Register(req *http.Request, resp response.Info) response.Info {
 func hash(str string) string {
 	return fmt.Sprintf("%x", sha256.Sum256([]byte(str)))
 }
+
+// SessionValid returns true if the user is logged in with a valid session ID
+func SessionValid(id []string, domain string) bool {
+	var authorized bool
+	if settings.Get(domain).SessionExpiry.Before(time.Now()) || len(id) != 1 {
+		authorized = false
+	} else {
+		authorized = settings.Get(domain).SessionID == id[0]
+	}
+	return authorized
+}

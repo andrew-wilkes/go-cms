@@ -5,8 +5,8 @@ import (
 	"gocms/pkg/archive"
 	"gocms/pkg/files"
 	"gocms/pkg/page"
-	"gocms/pkg/request"
 	"gocms/pkg/user"
+	"net/http"
 	"regexp"
 	"strconv"
 	"strings"
@@ -14,10 +14,10 @@ import (
 )
 
 // ReplaceTokens in HTML template
-func ReplaceTokens(r request.Info, html string, p page.Info) string {
-	baseURL := fmt.Sprintf("%s://%s", r.Scheme, r.Domain)
+func ReplaceTokens(req *http.Request, html string, p page.Info, subRoutes []string) string {
+	baseURL := fmt.Sprintf("%s://%s", req.URL.Scheme, req.Host)
 	year, month, day := time.Now().Date()
-	if user.GetStatus().LoggedIn {
+	if user.SessionValid(req.URL.Query()["id"], req.Host) {
 		html = strings.Replace(html, `#CSS#`, `<link rel="stylesheet" href="#HOST#/css/content-tools.min.css">`, 1)
 		html = strings.Replace(html, `#SCRIPTS#`, getScripts(), 1)
 	} else {
@@ -27,22 +27,22 @@ func ReplaceTokens(r request.Info, html string, p page.Info) string {
 	html = strings.ReplaceAll(html, `#HOST#`, baseURL)
 	html = strings.ReplaceAll(html, `#ID#`, fmt.Sprintf("%d", p.ID))
 	// The home page is associated with an ID of 1
-	html = strings.ReplaceAll(html, `#HOME#`, getHref(page.GetByID(r.Domain, 1, false), p.Route, baseURL))
-	html = strings.ReplaceAll(html, `#BREADCRUMB#`, GetBreadcrumbLinks(r, p, baseURL))
+	html = strings.ReplaceAll(html, `#HOME#`, getHref(page.GetByID(req.Host, 1, false), p.Route, baseURL))
+	html = strings.ReplaceAll(html, `#BREADCRUMB#`, GetBreadcrumbLinks(req, p, baseURL))
 	html = strings.ReplaceAll(html, `#CONTENT#`, p.Content)
 	html = strings.ReplaceAll(html, `#DAY#`, fmt.Sprint(day))
 	html = strings.ReplaceAll(html, `#MONTH#`, fmt.Sprint(month))
 	html = strings.ReplaceAll(html, `#YEAR#`, fmt.Sprint(year))
-	html = strings.ReplaceAll(html, `#ARCHIVE#`, generateArchive(r, baseURL, &p))
+	html = strings.ReplaceAll(html, `#ARCHIVE#`, generateArchive(req, baseURL, &p, subRoutes))
 	html = strings.ReplaceAll(html, `#PAGESINCATEGORY#`, getPagesInCategory(p, baseURL))
 	html = strings.ReplaceAll(html, `#TITLE#`, p.Title)
 	html = strings.ReplaceAll(html, "#DESCRIPTION#", p.Description)
 	html = strings.Replace(html, "#COMMENTS#", "", 1)
-	html = addMenus(html, baseURL, r.Route)
+	html = addMenus(html, baseURL, req.RequestURI)
 	html = addPageLinks(html, baseURL, p)
 	html = addCategoryLinks(html, baseURL, p)
 	html = addRecentPostsLinks(html, baseURL)
-	html = addPosts(r.Domain, html, baseURL)
+	html = addPosts(req.Host, html, baseURL)
 	html = strings.Replace(html, "#MORE#", "", 1)
 	return html
 }
@@ -158,19 +158,19 @@ func getScripts() string {
 	return strings.Join(html, "\n")
 }
 
-func generateArchive(r request.Info, baseURL string, p *page.Info) string {
+func generateArchive(req *http.Request, baseURL string, p *page.Info, subRoutes []string) string {
 	// The outer HTML will likely be UL tags in the template since a css class may be applied to it
 	var links []string
-	switch len(r.SubRoutes) {
+	switch len(subRoutes) {
 	case 0:
 		links = getYearArchiveLinks(baseURL)
 	case 1:
-		year := getInt(r.SubRoutes[0])
+		year := getInt(subRoutes[0])
 		p.Title = fmt.Sprintf("Archives for %d", year)
 		links = getMonthArchiveLinks(year, baseURL)
 	case 2:
-		year := getInt(r.SubRoutes[0])
-		month := time.Month(getInt(r.SubRoutes[1]))
+		year := getInt(subRoutes[0])
+		month := time.Month(getInt(subRoutes[1]))
 		p.Title = fmt.Sprintf("Archives for %s %d", month, year)
 		links = getDayArchiveLinks(year, month, baseURL)
 	}
@@ -289,17 +289,17 @@ func getHref(p page.Info, route string, baseURL string) string {
 }
 
 // GetBreadcrumbLinks returns a trail of links from the home page to the current page
-func GetBreadcrumbLinks(r request.Info, p page.Info, baseURL string) string {
+func GetBreadcrumbLinks(req *http.Request, p page.Info, baseURL string) string {
 	pages := []page.Info{p}
 	pid := p.Parent
 	for pid > 0 {
-		parentPage := page.GetByID(r.Domain, pid, false)
+		parentPage := page.GetByID(req.Host, pid, false)
 		pages = append([]page.Info{parentPage}, pages...)
 		pid = parentPage.Parent
 	}
 	links := []string{}
 	for _, bp := range pages {
-		links = append(links, getHref(bp, r.Route, baseURL))
+		links = append(links, getHref(bp, req.RequestURI, baseURL))
 	}
 	return strings.Join(links, " > ")
 }

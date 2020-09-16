@@ -2,11 +2,13 @@ package api
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"gocms/pkg/page"
 	"gocms/pkg/response"
 	"gocms/pkg/settings"
 	"gocms/pkg/user"
+	"io/ioutil"
 	"net/http"
 	"strconv"
 	"time"
@@ -19,10 +21,11 @@ var authorized bool
 func Process(req *http.Request, subRoutes []string) ([]string, string) {
 	var resp response.Info
 	if len(subRoutes) > 1 {
-		state = settings.Get(req.Domain)
-		sessionValid(req.GetArgs["id"]) // If the key doesn't exist, then "" is passed maybe?
+		state = settings.Get(req.Host)
+		authorized = SessionValid(req.URL.Query()["id"])
 		class := subRoutes[0]
 		action := subRoutes[1]
+
 		switch class {
 		case "user":
 			resp = userActions(action, req, resp)
@@ -57,18 +60,26 @@ func pageActions(action string, req *http.Request, resp response.Info) response.
 		switch action {
 		case "save":
 			var info page.EditInfo
-			err := json.Unmarshal(req.PostData["info"], &info)
+			decoder := json.NewDecoder(req.Body)
+			err := decoder.Decode(&info)
 			if err != nil {
 				resp.Msg = "Error decoding data!"
 			} else {
-				page.SaveContent(req.Domain, info.ID, info.Content)
+				page.SaveContent(req.Host, info.ID, info.Content)
 				resp.Msg = "ok"
 			}
 		// NOTE: This action is unnecessary with in-content editing
 		case "load":
-			i, er := strconv.Atoi(req.GetArgs["pid"])
-			if er == nil {
-				info := page.GetByID(req.Domain, i, true)
+			pid := req.URL.Query()["pid"]
+			var err error
+			var i int
+			if len(pid) != 1 {
+				err = errors.New("Missing pid")
+			} else {
+				i, err = strconv.Atoi(pid[0])
+			}
+			if err == nil {
+				info := page.GetByID(req.Host, i, true)
 				if info.ID == 0 {
 					resp.Msg = "Page not found!"
 				} else {
@@ -76,7 +87,7 @@ func pageActions(action string, req *http.Request, resp response.Info) response.
 					resp.Msg = "ok"
 				}
 			} else {
-				resp.Msg = fmt.Sprint(er)
+				resp.Msg = fmt.Sprint(err)
 			}
 		}
 	}
@@ -88,19 +99,23 @@ func pagesActions(action string, req *http.Request, resp response.Info) response
 	if authorized {
 		switch action {
 		case "save":
-			page.SaveRawData(req.Domain, []byte(req.PostData["pages"]))
+			data, _ := ioutil.ReadAll(req.Body)
+			page.SaveRawData(req.Host, data)
 		case "load":
-			resp.Data = string(page.LoadRawData(req.Domain))
+			resp.Data = string(page.LoadRawData(req.Host))
 		}
 		resp.Msg = "ok"
 	}
 	return resp
 }
 
-func sessionValid(id string) {
-	if state.SessionExpiry.Before(time.Now()) {
+// SessionValid returns true if the user is logged in with a valid session ID
+func SessionValid(id []string) bool {
+	var authorized bool
+	if state.SessionExpiry.Before(time.Now()) || len(id) != 1 {
 		authorized = false
 	} else {
-		authorized = state.SessionID == id
+		authorized = state.SessionID == id[0]
 	}
+	return authorized
 }
