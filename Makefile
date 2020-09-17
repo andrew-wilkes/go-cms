@@ -1,14 +1,11 @@
 b:
-	php scripts/build.php
+	go build -o build cmd/main/gocms.go
 
 deploy:
-	php scripts/deploy.php
-
-test:
-	go test gocms/cmd/main
+	go run scripts/deploy/deploy.go /var/www/gocms.com
 
 copyfiles:
-	php scripts/copytestfiles.php
+	go run scripts/copyfiles/copyfiles.go /var/www/gocms.com
 
 g:
 	go run scripts/generate/generate.go
