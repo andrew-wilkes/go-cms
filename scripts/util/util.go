@@ -10,19 +10,17 @@ import (
 // CheckArgs func
 func CheckArgs() string {
 	if len(os.Args) < 2 {
-		Check(errors.New("Missing website path"))
+		Check(errors.New("Missing installation path"))
 	}
 	path := os.Args[1]
-	_, err := os.Stat(path)
-	if err != nil {
-		Check(errors.New("The given directory does not exist"))
-	}
 	return path
 }
 
 // CreateFolder if it doesn't already exist
 func CreateFolder(path string, name string) {
-	path = filepath.Join(path, name)
+	if name != "" {
+		path = filepath.Join(path, name)
+	}
 	_, err := os.Stat(path)
 	if err != nil {
 		err = os.Mkdir(path, 0755)

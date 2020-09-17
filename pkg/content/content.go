@@ -15,7 +15,11 @@ import (
 
 // ReplaceTokens in HTML template
 func ReplaceTokens(req *http.Request, html string, p page.Info, subRoutes []string) string {
-	baseURL := fmt.Sprintf("%s://%s", req.URL.Scheme, req.Host)
+	scheme := "https"
+	if req.TLS == nil {
+		scheme = "http"
+	}
+	baseURL := fmt.Sprintf("%s://%s", scheme, req.Host)
 	year, month, day := time.Now().Date()
 	if user.SessionValid(req.URL.Query()["id"], req.Host) {
 		html = strings.Replace(html, `#CSS#`, `<link rel="stylesheet" href="#HOST#/css/content-tools.min.css">`, 1)
