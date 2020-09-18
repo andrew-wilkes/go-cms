@@ -1,17 +1,13 @@
 # Installation
 
-## Configuration
-Some configuration options need to be set in a **config.toml** file. An example file is provided.
-
-    [server]
-    port = 8090
-
 ## Server
 The server will be running say Apache, IIS, or NGINX.
 
 The server should be configured to send all URIs to the location of the App at the configured port.
 
 Other URI's such as for images, scripts, and other static files should be mapped to their location on port 80 or the https port.
+
+See the example [NGINX Config.](nginx.md) for how we might route specific patterns of requested resources.
 
 Ensure that the firewall rules allow external access from clients.
 

@@ -20,7 +20,7 @@ Here is an example of the file structure of a deployed project with one domain:
         domain.tld/
             data/
                 pages.json
-                status.json
+                settings.json
             templates/
                 post.html
                 page.html
