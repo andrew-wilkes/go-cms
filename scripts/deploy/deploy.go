@@ -22,6 +22,7 @@ func main() {
 	util.CreateFolder(path, "data")
 	util.CreateFolder(path, "templates")
 	util.CreateFolder(path, "pages")
+	util.CreateFolder(path, "static")
 
 	// Copy files
 	files, err := ioutil.ReadDir("build")

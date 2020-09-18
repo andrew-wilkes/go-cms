@@ -36,7 +36,7 @@ func main() {
 	fmt.Printf("Copied %d template files.\n", count)
 
 	// Remove existing css files
-	destPath = filepath.Join(path, "css")
+	destPath = filepath.Join(path, "static", "css")
 	removeFiles(destPath)
 
 	// Copy css files
@@ -45,7 +45,7 @@ func main() {
 	fmt.Printf("Copied %d css files.\n", count)
 
 	// Remove existing js files
-	destPath = filepath.Join(path, "js")
+	destPath = filepath.Join(path, "static", "js")
 	removeFiles(destPath)
 
 	// Copy js files
