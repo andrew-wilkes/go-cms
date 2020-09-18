@@ -99,7 +99,7 @@ func Register(req *http.Request, resp response.Info) response.Info {
 		info.SessionID = xid.New().String()
 		info.SessionExpiry = time.Now().Add(time.Hour * 8)
 		info.LastTime = time.Now()
-		info.LastIP = req.RemoteAddr
+		info.LastIP = GetIP(req)
 		settings.Set(info, req.Host)
 		resp.ID = info.SessionID
 		resp.Msg = "ok"
@@ -121,4 +121,15 @@ func SessionValid(id []string, domain string) bool {
 		authorized = settings.Get(domain).SessionID == id[0]
 	}
 	return authorized
+}
+
+// GetIP gets a requests IP address by reading off the forwarded-for
+// header (for proxies) and falls back to use the remote address.
+// Credit: https://golangcode.com/get-the-request-ip-addr/
+func GetIP(r *http.Request) string {
+	forwarded := r.Header.Get("X-FORWARDED-FOR")
+	if forwarded != "" {
+		return forwarded
+	}
+	return r.RemoteAddr
 }
