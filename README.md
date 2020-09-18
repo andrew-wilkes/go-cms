@@ -33,21 +33,22 @@ Here is an example of the file structure of a deployed project with one domain:
                 2.html
                 .
                 .
-            js/
-                script.js
-                .
-                .
-            css/
-                main.css
-                .
-                .
-            images/
-                logo.png
-                .
-                .
-            robots.txt
-            dashboard/
-                front_end_SPA_code
+            static/
+                js/
+                    script.js
+                    .
+                    .
+                css/
+                    main.css
+                    .
+                    .
+                images/
+                    logo.png
+                    .
+                    .
+                robots.txt
+                dashboard/
+                    front_end_SPA_code
 
 The *dashboard* folder name will be customizable.
 

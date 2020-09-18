@@ -1,47 +1,42 @@
 # NGINX Server Block Configuration
 
 Here is an example of how to set up a server block in the **nginx.conf** file or elsewhere that you may do it:
+    
+	server {
+		server_name .gocms.com;
 
-    server {
-            server_name gocms.com;
-            root /var/www/gocms.com;
+        # routes applied to the App
+		location / {
+			proxy_set_header Host $host;
+			# proxy_set_header X-Real-IP $remote_addr;
+			proxy_pass http://localhost:8090;
+		}
 
-            listen 80;
+        # css, js, images etc.
+		location ~* \.\w+$ {
+			root   /var/www/gocms/gocms.com/static/;
+			access_log off;
+			expires max;
+		}
 
-            index index.php index.html;
+        # static html
+		location ~* \.html$ {
+			root   /var/www/gocms/gocms.com/static/;
+		}
 
-
-            location = /favicon.ico {
-                log_not_found off;
-                access_log off;
-            }
-
-            location = /robots.txt {
-                allow all;
-                log_not_found off;
-                access_log off;
-            }
-            
-            location / {
-                try_files $uri $uri/ /index.php;
-            }
-
-            # static file 404's aren't logged and expires header is set to maximum age
-            location ~* \.(jpg|jpeg|gif|css|png|js|ico|html)$ {
-                access_log off;
-                log_not_found off;
-                expires max;
-            }
-            
-            location ~ \.php$ {
-                try_files  $uri =404;
-                fastcgi_pass   unix:/var/run/php-fpm/php-fpm.sock;
-                fastcgi_index  index.php;
-                include        fastcgi.conf;
-            }
+        location = /robots.txt {
+            allow all;
+            log_not_found off;
+            access_log off;
         }
 
-In this example our domain name is: **gocms. com**
+		location = /favicon.ico {
+			log_not_found off;
+			access_log off;
+		}
+	}
+
+In this example our domain name is: **gocms.com**
 
 Link: https://docs.nginx.com/nginx/admin-guide/installing-nginx/installing-nginx-open-source/
 
@@ -58,15 +53,3 @@ Stop Nginx Service
 Enable Nginx on boot
 
     sudo systemctl enable nginx
-
-Get 502 Bad Gateway if php-fpm is not running.
-
-    sudo systemctl start php-fpm
-    sudo systemctl stop php-fpm
-
-### PHP-fpm Settings
-
-In */etc/php/php-fpm.d/www.conf* set:
-
-    user = http
-    group = www-data
