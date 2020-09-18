@@ -19,12 +19,11 @@ The admin end points will be according to a very simple REST API as follows:
 ## App Packages
 
 ### main
+We pass the data to the **router** package for processing into return values of headers and content.
 
-The URI is further processed with the `ParseURI` function to extract GET vars that may be present e.g. `/contact?a=2&b=3`
+Then we assemle the response headers, status code, and content to output as a server on port 8090.
 
-The data is put into a `reqest.Info` structure.
-
-Then we pass the data to the **router** package for processing into return values of headers and content.
+The decision was made to not load static files from the server and output them from here. So we configure the server to react to any URI with an extension (.???) as a static file. This App ony handles routes without a file extension.
 
 ### response
 This package simply contains an Info data structure for the output response data from functions feeding back to the final output response of the App.
