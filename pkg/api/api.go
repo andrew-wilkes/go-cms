@@ -17,7 +17,7 @@ var state settings.Values
 var authorized bool
 
 // Process takes action
-func Process(req *http.Request, subRoutes []string) (int, map[string]string, string) {
+func Process(req *http.Request, subRoutes []string, headers map[string]string) (int, map[string]string, string) {
 	var resp response.Info
 	if len(subRoutes) > 1 {
 		state = settings.Get(req.Host)
@@ -35,7 +35,7 @@ func Process(req *http.Request, subRoutes []string) (int, map[string]string, str
 		}
 	}
 	b, _ := json.Marshal(resp)
-	return http.StatusOK, map[string]string{}, string(b)
+	return http.StatusOK, headers, string(b)
 }
 
 func userActions(action string, req *http.Request, resp response.Info) response.Info {

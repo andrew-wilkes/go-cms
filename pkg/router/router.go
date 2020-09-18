@@ -19,7 +19,8 @@ func Process(req *http.Request) (int, map[string]string, string) {
 	domain := req.Host
 	html := ""
 	if pageRoute == "/api" {
-		return api.Process(req, subRoutes)
+		headers["Content-Type"] = "application/json"
+		return api.Process(req, subRoutes, headers)
 	}
 	page := page.GetByRoute(domain, pageRoute, true)
 	if page.ID == 0 {
