@@ -1,0 +1,71 @@
+import { PackageLock } from './package-lock-parser';
+import { YarnLock } from './yarn-lock-parse';
+export interface Dep {
+    name: string;
+    version: string;
+    dev?: boolean;
+}
+interface WorkspacesAlternateConfig {
+    packages?: string[];
+}
+export interface ManifestFile {
+    name: string;
+    private?: string;
+    engines?: {
+        node?: string;
+    };
+    workspaces?: string[] | WorkspacesAlternateConfig;
+    dependencies?: {
+        [dep: string]: string;
+    };
+    devDependencies?: {
+        [dep: string]: string;
+    };
+    version?: string;
+}
+export interface DepTreeDep {
+    name?: string;
+    version?: string;
+    dependencies?: {
+        [depName: string]: DepTreeDep;
+    };
+    labels?: {
+        [key: string]: string | undefined;
+        scope?: 'dev' | 'prod';
+        pruned?: 'cyclic' | 'true';
+        missingLockFileEntry?: 'true';
+    };
+}
+export interface PkgTree extends DepTreeDep {
+    type?: string;
+    packageFormatVersion?: string;
+    dependencies: {
+        [depName: string]: DepTreeDep;
+    };
+    meta?: {
+        nodeVersion: string;
+        packageManagerVersion?: string;
+    };
+    hasDevDependencies?: boolean;
+    cyclic?: boolean;
+    size?: number;
+}
+export declare enum Scope {
+    prod = "prod",
+    dev = "dev"
+}
+export declare enum LockfileType {
+    npm = "npm",
+    yarn = "yarn",
+    yarn2 = "yarn2"
+}
+export interface LockfileParser {
+    parseLockFile: (lockFileContents: string) => Lockfile;
+    getDependencyTree: (manifestFile: ManifestFile, lockfile: Lockfile, includeDev?: boolean, strict?: boolean) => Promise<PkgTree>;
+}
+export declare type Lockfile = PackageLock | YarnLock;
+export declare function parseManifestFile(manifestFileContents: string): ManifestFile;
+export declare function getTopLevelDeps(targetFile: ManifestFile, includeDev: boolean): Dep[];
+export declare function createDepTreeDepFromDep(dep: Dep): DepTreeDep;
+export declare function getYarnWorkspaces(targetFile: string): string[] | false;
+export {};

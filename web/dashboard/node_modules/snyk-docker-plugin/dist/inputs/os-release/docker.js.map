@@ -1,0 +1,1 @@
+{"version":3,"file":"docker.js","sourceRoot":"","sources":["../../../lib/inputs/os-release/docker.ts"],"names":[],"mappings":";;AAGO,KAAK,UAAU,YAAY,CAChC,MAAc,EACd,WAA8B;IAE9B,IAAI;QACF,OAAO,CAAC,MAAM,MAAM,CAAC,OAAO,CAAC,WAAW,CAAC,CAAC,CAAC,MAAM,CAAC;KACnD;IAAC,OAAO,KAAK,EAAE;QACd,MAAM,IAAI,KAAK,CAAC,KAAK,CAAC,MAAM,CAAC,CAAC;KAC/B;AACH,CAAC;AATD,oCASC"}

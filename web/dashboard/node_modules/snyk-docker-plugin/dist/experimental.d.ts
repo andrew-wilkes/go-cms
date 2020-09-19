@@ -1,0 +1,5 @@
+import { DockerFileAnalysis } from "./docker-file";
+import { PluginResponse } from "./types";
+export declare function experimentalAnalysis(targetImage: string, dockerfileAnalysis: DockerFileAnalysis | undefined, options: any): Promise<PluginResponse>;
+export declare function distroless(targetImage: string, dockerfileAnalysis: DockerFileAnalysis | undefined, options: any): Promise<PluginResponse>;
+export declare function fullImageSavePath(imageSavePath: string | undefined): string;

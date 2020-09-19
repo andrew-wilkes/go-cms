@@ -14,9 +14,6 @@ var websitePath string
 func main() {
 	path := util.CheckArgs()
 
-	util.CreateFolder(path, "js")
-	util.CreateFolder(path, "css")
-
 	// Remove existing page files
 	destPath := filepath.Join(path, "pages")
 	removeFiles(destPath)
@@ -62,6 +59,22 @@ func main() {
 	count = copyFiles(srcPath, destPath, ".json")
 	fmt.Printf("Copied %d data files.\n", count)
 
+	/*
+		count = 0
+		dbPaths := []string{"", "assets", "components", "router", "js"}
+		for _, dbPath := range dbPaths {
+			util.CreateFolder(path, filepath.Join("dashboard", dbPath))
+
+			// Remove existing dashboard files
+			destPath = filepath.Join(path, "static", "dashboard", dbPath)
+			removeFiles(destPath)
+
+			// Copy dashboard files
+			srcPath = filepath.Join("dashboard", "src", dbPath)
+			count += copyFiles(srcPath, destPath, ".*")
+		}
+		fmt.Printf("Copied %d dashboard files.\n", count)
+	*/
 }
 
 func removeFiles(path string) {
@@ -76,7 +89,7 @@ func copyFiles(srcPath string, destPath string, ext string) int {
 	count := 0
 	for _, f := range files {
 		fn := f.Name()
-		if filepath.Ext(fn) == ext {
+		if filepath.Ext(fn) == ext || ext == ".*" && filepath.Ext(fn) != "" {
 			util.CopyFile(filepath.Join(srcPath, fn), filepath.Join(destPath, fn))
 			count++
 		}

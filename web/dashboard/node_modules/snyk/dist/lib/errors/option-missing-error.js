@@ -1,0 +1,16 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.OptionMissingErrorError = void 0;
+const custom_error_1 = require("./custom-error");
+class OptionMissingErrorError extends custom_error_1.CustomError {
+    constructor(option, required) {
+        const msg = `The ${option} option can only be use in combination with ${required
+            .sort()
+            .join(' or ')}.`;
+        super(msg);
+        this.code = 422;
+        this.userMessage = msg;
+    }
+}
+exports.OptionMissingErrorError = OptionMissingErrorError;
+//# sourceMappingURL=option-missing-error.js.map

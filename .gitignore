@@ -16,3 +16,5 @@ config.toml
 build/*
 !build/README.md
 *.ods#
+
+node_modules/*
