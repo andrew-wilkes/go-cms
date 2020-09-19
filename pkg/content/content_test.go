@@ -2,8 +2,6 @@ package content
 
 import (
 	"bytes"
-	"crypto/md5"
-	"fmt"
 	"gocms/pkg/files"
 	"gocms/pkg/page"
 	"net/http"
@@ -14,14 +12,12 @@ import (
 func TestReplaceTokens(t *testing.T) {
 	files.Root = "../files/"
 	page.LoadData("test")
-	html := "#TITLE# #TOPMENU# #CONTENT# #FOOTERMENU# #DATE# #SCRIPTS#"
+	html := "#TITLE# #HOME# #CONTENT#"
 	page := page.Info{Title: "Test", Content: "Content"}
 	req, _ := http.NewRequest("GET", "", bytes.NewBufferString(""))
 	req.Host = "test"
-	content := ReplaceTokens(req, html, page, []string{})
-	println(content)
-	got := fmt.Sprintf("%x", md5.Sum([]byte(content)))
-	want := "90b74676249768fa7b9e78f1c444cecc"
+	got := ReplaceTokens(req, html, page, []string{})
+	want := `Test <a href="http://test/">Home Page</a> Content`
 	if got != want {
 		t.Errorf("Want %s got %s", want, got)
 	}

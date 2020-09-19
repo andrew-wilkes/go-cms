@@ -169,6 +169,7 @@ func TestRegister(t *testing.T) {
 func TestSessionValid(t *testing.T) {
 	files.Root = "../files/"
 	// New user
+	settings.Set(settings.Values{}, "test")
 	got := SessionValid([]string{""}, "test")
 	want := true
 	if got != want {
