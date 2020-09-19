@@ -6,6 +6,7 @@ import (
 	"gocms/pkg/files"
 	"gocms/pkg/page"
 	"gocms/pkg/response"
+	"gocms/pkg/settings"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -18,6 +19,16 @@ func TestUserActions(t *testing.T) {
 	req.Header.Set("Content-Type", "application/json")
 	req.Host = "test"
 	res := response.Info{}
+	// New user
+	settings.Set(settings.Values{}, req.Host)
+	_, _, rb := Process(req, []string{}, map[string]string{})
+	_ = json.Unmarshal([]byte(rb), &res)
+	w := "register"
+	if w != res.Msg {
+		t.Errorf("Got %v want %v", res.Msg, w)
+	}
+	settings.Set(settings.Values{Email: "a@b.co"}, req.Host)
+	res.Msg = ""
 	// No action
 	got := userActions("", req, res)
 	want := response.Info{}

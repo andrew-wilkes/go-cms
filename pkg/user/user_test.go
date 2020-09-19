@@ -141,6 +141,20 @@ func TestRegister(t *testing.T) {
 	if !strings.HasPrefix(resp.Msg, "Please") {
 		t.Errorf("Got %s", resp.Msg)
 	}
+	// Test with bad email address
+	resp = response.Info{}
+	testUser = Credentials{Name: "Admin", Email: ".com", Pass: "123456"}
+	requestBody, err = json.Marshal(testUser)
+	req.Body = ioutil.NopCloser(bytes.NewBuffer(requestBody))
+	resp = Register(req, resp)
+	got = resp.ID
+	want = ""
+	if want != got {
+		t.Errorf("Got %s want %s", got, want)
+	}
+	if !strings.HasPrefix(resp.Msg, "Please") {
+		t.Errorf("Got %s", resp.Msg)
+	}
 	testUser = Credentials{Name: "Admin", Email: "a@b.com", Pass: "123456"}
 	requestBody, err = json.Marshal(testUser)
 	req.Body = ioutil.NopCloser(bytes.NewBuffer(requestBody))
@@ -154,21 +168,28 @@ func TestRegister(t *testing.T) {
 
 func TestSessionValid(t *testing.T) {
 	files.Root = "../files/"
+	// New user
+	got := SessionValid([]string{""}, "test")
+	want := true
+	if got != want {
+		t.Errorf("Got %v want %v", got, want)
+	}
 	// Session expired
 	state := settings.Values{
 		SessionExpiry: time.Now().AddDate(0, 0, -1),
 		SessionID:     "aaa",
+		Email:         "a@b.co",
 	}
 	settings.Set(state, "test")
-	got := SessionValid([]string{"aaa"}, "test")
-	want := false
+	got = SessionValid([]string{"aaa"}, "test")
+	want = false
 	if got != want {
 		t.Errorf("Got %v want %v", got, want)
 	}
 	// Session not expired, wrong id
 	state.SessionExpiry = time.Now().AddDate(0, 0, 1)
 	settings.Set(state, "test")
-	got = SessionValid([]string{"z"}, "test")
+	got = SessionValid([]string{"wrongID"}, "test")
 	want = false
 	if got != want {
 		t.Errorf("Got %v want %v", got, want)
