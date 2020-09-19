@@ -29,6 +29,7 @@ The available **make** commands are:
 - make deploy
 - make copyfiles
 - make g
+- make test
 
 Note that: *b* is for *build* and *g* is for *generate*
 

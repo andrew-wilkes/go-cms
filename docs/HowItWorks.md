@@ -8,6 +8,7 @@ In most cases, they will be requests for content such as a web page. In other ca
 
 The admin end points will be according to a very simple REST API as follows:
 
+    /api
     /api/user/logon
     /api/user/logoff
     /api/user/register
@@ -15,6 +16,8 @@ The admin end points will be according to a very simple REST API as follows:
     /api/page/save
     /api/pages/load
     /api/pages/save 
+
+The `/api` end point responds with `Msg: "register"` or `Msg: "logon"` To determine what the Dashboard should initially display to the user.
 
 ## App Packages
 

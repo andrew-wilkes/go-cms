@@ -8,8 +8,10 @@ import (
 
 // This is the entry point function for the application
 func main() {
+	const port = 8090
+	fmt.Printf("Listening on port: %d\n", port)
 	http.HandleFunc("/", requestHandler)
-	http.ListenAndServe(":8090", nil)
+	http.ListenAndServe(fmt.Sprintf(":%d", port), nil)
 }
 
 func requestHandler(w http.ResponseWriter, req *http.Request) {

@@ -19,13 +19,15 @@ var authorized bool
 // Process takes action
 func Process(req *http.Request, subRoutes []string, headers map[string]string) (int, map[string]string, string) {
 	var resp response.Info
-	// Respond with a message to register if no user email has been saved
+	// Respond with a message to "register" if no user email has been saved. Or "logon", "ok", or "" on error
 	if settings.Get(req.Host).Email == "" {
 		resp.Msg = "register"
+	} else {
+		resp.Msg = "logon"
 	}
 	if len(subRoutes) > 1 {
 		state = settings.Get(req.Host)
-		authorized = user.SessionValid(req.URL.Query()["id"], req.Host) // What if no ID key?
+		authorized = user.SessionValid(req.URL.Query()["id"], req.Host)
 		class := subRoutes[0]
 		action := subRoutes[1]
 
