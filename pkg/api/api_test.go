@@ -53,6 +53,8 @@ func TestUserActions(t *testing.T) {
 	if got.Msg != "ok" {
 		t.Errorf("Got %v want %v", got.Msg, "ok")
 	}
+	// Clear the settings
+	settings.Set(settings.Values{}, "test")
 }
 
 func TestPageActions(t *testing.T) {
@@ -125,16 +127,5 @@ func TestPagesActions(t *testing.T) {
 	b, _ := json.Marshal(requestBody)
 	if got.Data != string(b) {
 		t.Errorf("Got %v want %v", got.Data, string(b))
-	}
-}
-
-func TestProcess(t *testing.T) {
-	req, _ := http.NewRequest("POST", "", bytes.NewBufferString(""))
-	req.Header.Set("Content-Type", "application/json")
-	req.Host = "test"
-	_, _, response := Process(req, []string{}, map[string]string{})
-	want := `{"ID":"","Data":"","Msg":""}`
-	if response != want {
-		t.Errorf("Got %s want %s", response, want)
 	}
 }

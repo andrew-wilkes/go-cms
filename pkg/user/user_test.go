@@ -201,4 +201,6 @@ func TestSessionValid(t *testing.T) {
 	if got != want {
 		t.Errorf("Got %v want %v", got, want)
 	}
+	// Clear the settings
+	settings.Set(settings.Values{}, "test")
 }
