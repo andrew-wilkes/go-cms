@@ -13,8 +13,10 @@ Some tests require data to be set up and we must first generate the test data. T
 
 This will create `pages.json` in the `files/test/data` folder and many html content files in `files/test/pages`.
 
-## Deployment of test version
-It is annoying to test a web app by refreshing a browser with different user input and observing results in the browser. So there is a `test.html` file (in the www folder) which may be used to capture request data for a variety of scenarious, save that data, and use the data in unit tests.
+To run the whole suite of tests for the project we execute: `make test`.
+
+## web files
+It is annoying to test a web app by refreshing a browser with different user input and observing results in the browser. So there is a `test.html` file (in the web folder) which may be used to capture request data for a variety of scenarious, save that data, and use the data in unit tests.
 
 ## Copying of Test Pages and Data
 By running the `make copyfiles` command, the test page data and content files will be copied to the server after erasing the old data and content files that were on the server before.

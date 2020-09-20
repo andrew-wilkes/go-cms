@@ -76,7 +76,7 @@ Other tokens include a data value such as a tag or digit count value. Examples a
 It's best to have a look at the `content.go` source code to see all of the available tokens and the code that produces the associated content. It includes recursive functions and slice magic.
 
 ### settings
-This package is responsible for CRUD operations on application settings. At this moment, the actual settings that will be available are undefined.
+This package is responsible for storing user credential verification data and the session id and expiry. And maybe Dashboard info such as the project name.
 
 ### user
 This package is responsible for user login and status features.
