@@ -3,7 +3,7 @@
 There are several ways of testing available:
 
 - unit testing of packages
-- deployment of test version of index.php
+- deployment `test.html` to exercise the App with a variety of http requests
 - copying of test pages and data
 
 ## Unit Testing of Packages

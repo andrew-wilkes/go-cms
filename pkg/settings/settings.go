@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"gocms/pkg/files"
 	"io/ioutil"
+	"path/filepath"
 	"time"
 )
 
@@ -60,5 +61,5 @@ func save(domain string) {
 }
 
 func fileName(domain string) string {
-	return fmt.Sprintf("%s%s/data/settings.json", files.Root, domain)
+	return filepath.Join(fmt.Sprintf("%s%s", files.Root, domain), "data", "settings.json")
 }

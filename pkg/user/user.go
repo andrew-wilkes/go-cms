@@ -38,7 +38,6 @@ func LogOn(req *http.Request, resp response.Info) response.Info {
 	if err != nil {
 		ok = false
 		resp.Msg = "Error decoding data!"
-
 	}
 	info := settings.Get(req.Host)
 	if ok && info.Email != cred.Email {
@@ -61,7 +60,7 @@ func LogOn(req *http.Request, resp response.Info) response.Info {
 		resp.Data = string(data)
 		// Save the new info to settings
 		info.LastTime = time.Now()
-		info.LastIP = req.RemoteAddr
+		info.LastIP = GetIP(req)
 		settings.Set(info, req.Host)
 	}
 	return resp
