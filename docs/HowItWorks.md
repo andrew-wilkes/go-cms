@@ -64,7 +64,7 @@ This package contains the `Root` path variable to the data files and a `GetTempl
 Also, the files folder where we place this package file is a convenient place to store test data files. These files are for example JSON input data, and generated web pages.
 
 ### page
-This package is responsible for saving and loading page data and content. It also has functions for returning a page by ID or Route, and to provide lists of pages. Also, it has the page.Info structure definition.
+This package is responsible for saving and loading page data and content. It also has functions for returning a page by ID or Route, and to provide lists of pages. Also, it has the page.Info structure definition. This includes a Format specifier which is used as the file extension. Valid values are: html, md, txt, css, js, and log.
 
 ### content
 This package is responsible for assembling content and replacing tokens in templates with the content.
@@ -74,6 +74,8 @@ Template tokens are comprised of upper-case text surrounded by hashes e.g. #TITL
 Other tokens include a data value such as a tag or digit count value. Examples are: #SIDE_MENU# and #PAGES_2# which specify the actual menu or the depth of the indented list of pages in a tree of parent-child relationships.
 
 It's best to have a look at the `content.go` source code to see all of the available tokens and the code that produces the associated content. It includes recursive functions and slice magic.
+
+`md` format causes the content to be transformed from Markdown (GIT flavour) to HTML.
 
 ### settings
 This package is responsible for storing user credential verification data and the session id and expiry. And maybe Dashboard info such as the project name.
