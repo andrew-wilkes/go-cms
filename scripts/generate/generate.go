@@ -135,9 +135,10 @@ func addPage(title string, route string, id int, parent int, template string, ca
 	})
 
 	content := "Content for " + title
-	if id == 384 {
-		content = "before#MORE#after"
+
+	if template == "post" {
+		content = content + " before#MORE#after"
 	}
 
-	page.SaveContent("test", id, content)
+	page.SaveContent("test", id, "html", content)
 }

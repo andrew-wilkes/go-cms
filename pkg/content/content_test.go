@@ -127,6 +127,7 @@ func TestGenerateArchive(t *testing.T) {
 func TestAddPosts(t *testing.T) {
 	files.Root = "../files/"
 	page.LoadData("test")
+	// Insert 1 post after the content
 	got := addPosts("test", "abc #POSTS_1#", "test.com")
 	want := "Read more"
 	if !strings.Contains(got, "Read more") {
@@ -181,6 +182,21 @@ func TestAddRecentPostsLinks(t *testing.T) {
 	got := addRecentPostsLinks("aaa #RECENT_4# bbb", "test.com")
 	want := "aaa <li><a"
 	if !strings.HasPrefix(got, want) {
+		t.Errorf("Want %s got %s", want, got)
+	}
+}
+
+func TestTranslateContent(t *testing.T) {
+	page := page.Info{Content: "## H2", Format: "md"}
+	got := translateContent(page)
+	want := "<h2>H2</h2>\n"
+	if got != want {
+		t.Errorf("Want %s got %s", want, got)
+	}
+	page.Format = "html"
+	got = translateContent(page)
+	want = "## H2"
+	if got != want {
 		t.Errorf("Want %s got %s", want, got)
 	}
 }

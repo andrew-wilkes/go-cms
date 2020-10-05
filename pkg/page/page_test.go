@@ -85,7 +85,7 @@ func TestGetByID(t *testing.T) {
 
 func TestSaveContent(t *testing.T) {
 	setup(t)
-	SaveContent(domain, 9999, domain)
+	SaveContent(domain, 9999, "html", domain)
 	fn := files.Root + "test/pages/9999.html"
 	data, err := ioutil.ReadFile(fn)
 	if err != nil {

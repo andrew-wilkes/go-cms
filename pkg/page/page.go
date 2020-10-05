@@ -26,6 +26,7 @@ type Info struct {
 	Title       string    // As used in the HTML title tag and link text
 	Description string    // As used in the HTML description tag and link title text (optional)
 	Content     string    // Used to store the HTML content for the page when it needs to be passed around in the Dashboard
+	Format      string    // Content format: Markdown (md), or HTML (html). Matches the file extension
 	Route       string    // The virtual URI route to match with the webpage being requested
 	Author      string    // Maybe useful for displaying the author of the content
 	Status      Status    // A flag for the published or draft status of the page
@@ -62,7 +63,7 @@ func find(domain string, id int, route string, getContent bool) Info {
 	for _, p := range pages {
 		if p.ID == id || p.Route == route {
 			if getContent {
-				p.Content = LoadContent(domain, p.ID)
+				p.Content = LoadContent(domain, p.ID, p.Format)
 			}
 			page = p
 			break
@@ -72,22 +73,22 @@ func find(domain string, id int, route string, getContent bool) Info {
 }
 
 // LoadContent return the contents of the page content file
-func LoadContent(domain string, id int) string {
-	content, _ := ioutil.ReadFile(fmt.Sprintf("%s%s/pages/%d.html", files.Root, domain, id))
+func LoadContent(domain string, id int, ext string) string {
+	content, _ := ioutil.ReadFile(fmt.Sprintf("%s%s/pages/%d.%s", files.Root, domain, id, ext))
 	return string(content)
 }
 
 // SaveContent saves page content to a file
-func SaveContent(domain string, id int, content string) {
-	err := ioutil.WriteFile(fmt.Sprintf("%s%s/pages/%d.html", files.Root, domain, id), []byte(content), 0660)
+func SaveContent(domain string, id int, ext string, content string) {
+	err := ioutil.WriteFile(fmt.Sprintf("%s%s/pages/%d.%s", files.Root, domain, id, ext), []byte(content), 0660)
 	if err != nil {
 		panic(err)
 	}
 }
 
 // Delete deletes a page file
-func Delete(domain string, id int) {
-	err := os.Remove(fmt.Sprintf("%s%s/pages/%d.html", files.Root, domain, id))
+func Delete(domain string, id int, ext string) {
+	err := os.Remove(fmt.Sprintf("%s%s/pages/%d.%s", files.Root, domain, id, ext))
 	if err != nil {
 		panic(err)
 	}
@@ -209,7 +210,7 @@ func GetRecentPosts(n int, getContent bool, domain string) []Info {
 		p := pages[i]
 		if p.Status == Published && p.Template == "post" {
 			if getContent {
-				p.Content = LoadContent(domain, p.ID)
+				p.Content = LoadContent(domain, p.ID, p.Format)
 			}
 			posts[count] = p
 			count++

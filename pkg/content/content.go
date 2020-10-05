@@ -11,6 +11,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/gomarkdown/markdown"
 )
 
 // ReplaceTokens in HTML template
@@ -33,7 +35,7 @@ func ReplaceTokens(req *http.Request, html string, p page.Info, subRoutes []stri
 	// The home page is associated with an ID of 1
 	html = strings.ReplaceAll(html, `#HOME#`, getHref(page.GetByID(req.Host, 1, false), p.Route, baseURL))
 	html = strings.ReplaceAll(html, `#BREADCRUMB#`, GetBreadcrumbLinks(req, p, baseURL))
-	html = strings.ReplaceAll(html, `#CONTENT#`, p.Content)
+	html = strings.ReplaceAll(html, `#CONTENT#`, translateContent(p))
 	html = strings.ReplaceAll(html, `#DAY#`, fmt.Sprint(day))
 	html = strings.ReplaceAll(html, `#MONTH#`, fmt.Sprint(month))
 	html = strings.ReplaceAll(html, `#YEAR#`, fmt.Sprint(year))
@@ -49,6 +51,13 @@ func ReplaceTokens(req *http.Request, html string, p page.Info, subRoutes []stri
 	html = addPosts(req.Host, html, baseURL)
 	html = strings.Replace(html, "#MORE#", "", 1)
 	return html
+}
+
+func translateContent(p page.Info) string {
+	if p.Format == "md" {
+		return string(markdown.ToHTML([]byte(p.Content), nil, nil))
+	}
+	return p.Content
 }
 
 func addMenus(html string, baseURL string, route string) string {
