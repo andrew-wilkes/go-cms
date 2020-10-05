@@ -126,6 +126,7 @@ func addPage(title string, route string, id int, parent int, template string, ca
 		Parent:   parent,
 		Title:    title,
 		Content:  title,
+		Format:   "html",
 		Template: template,
 		Route:    "/" + route,
 		Status:   page.Published,

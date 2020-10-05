@@ -70,7 +70,7 @@ func pageActions(action string, req *http.Request, resp response.Info) response.
 			if err != nil {
 				resp.Msg = "Error decoding data!"
 			} else {
-				page.SaveContent(req.Host, info.ID, info.Content)
+				page.SaveContent(req.Host, info.ID, info.Format, info.Content)
 				resp.Msg = "ok"
 			}
 		// NOTE: This action is unnecessary with in-content editing

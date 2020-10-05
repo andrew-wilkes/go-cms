@@ -148,6 +148,7 @@ func addPosts(domain string, html string, baseURL string) string {
 			t = strings.Replace(t, "#DAY#", fmt.Sprint(day), 1)
 			t = strings.Replace(t, "#TITLE#", p.Title, 1)
 			t = strings.Replace(t, "#DESCRIPTION#", p.Description, 1)
+			p.Content = page.LoadContent(domain, p.ID, p.Format)
 			subStr := strings.Split(p.Content, "#MORE#")
 			if len(subStr) > 1 {
 				p.Title = "Read more ..."

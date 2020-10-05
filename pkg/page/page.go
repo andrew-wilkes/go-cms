@@ -41,6 +41,7 @@ type Info struct {
 type EditInfo struct {
 	ID      int
 	Content string
+	Format  string
 }
 
 // GetByID by ID a page or post
@@ -80,10 +81,24 @@ func LoadContent(domain string, id int, ext string) string {
 
 // SaveContent saves page content to a file
 func SaveContent(domain string, id int, ext string, content string) {
+	// Check for valid file ext
+	if isBadExt(ext) {
+		panic("Invalid file extension")
+	}
 	err := ioutil.WriteFile(fmt.Sprintf("%s%s/pages/%d.%s", files.Root, domain, id, ext), []byte(content), 0660)
 	if err != nil {
 		panic(err)
 	}
+}
+
+func isBadExt(ext string) bool {
+	exts := []string{"html", "md", "txt", "log", "css", "js"}
+	for _, x := range exts {
+		if x == ext {
+			return false
+		}
+	}
+	return true
 }
 
 // Delete deletes a page file

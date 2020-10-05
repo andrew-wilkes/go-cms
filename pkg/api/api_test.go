@@ -72,7 +72,7 @@ func TestPageActions(t *testing.T) {
 	}
 	// Save action authorized
 	authorized = true
-	info := page.EditInfo{ID: 777, Content: "xyz"}
+	info := page.EditInfo{ID: 777, Content: "xyz", Format: "html"}
 	requestBody, _ := json.Marshal(info)
 	req.Body = ioutil.NopCloser(bytes.NewBuffer(requestBody))
 	got = pageActions("save", req, res)
@@ -80,7 +80,7 @@ func TestPageActions(t *testing.T) {
 		t.Errorf("Got %v want %v", got.Msg, "ok")
 	}
 	// Delete saved file
-	page.Delete("test", 777)
+	page.Delete("test", 777, "html")
 	// Load file
 	q := req.URL.Query()
 	q.Add("pid", "1")
